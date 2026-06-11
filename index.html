@@ -5,104 +5,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Media Kit | Rose Gerçóssimo</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #fbf9f8 0%, #fef5f2 100%);
-            color: #1b1c1c;
-            scroll-behavior: smooth;
-        }
-        h1, h2, h3, .font-serif {
-            font-family: 'Playfair Display', serif;
-        }
-        /* Efeito glassmorphism */
-        .glass {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-        /* Animações */
-        @keyframes fadeUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        .animate-fade-up {
-            animation: fadeUp 0.6s ease-out forwards;
-        }
-        @keyframes growWidth {
-            from { width: 0%; }
-            to { width: var(--final-width); }
-        }
-        .animate-grow {
-            animation: growWidth 0.8s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards;
-            width: 0% !important;
-        }
-        /* Hover dos cards */
-        .hover-lift {
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .hover-lift:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 25px -12px rgba(184, 0, 73, 0.15);
-        }
-        /* Botão com ripple */
-        .btn-ripple {
-            position: relative;
-            overflow: hidden;
-            transition: all 0.2s;
-        }
-        .btn-ripple:active {
-            transform: scale(0.96);
-        }
-        /* Bordas personalizadas */
-        .stitching-border {
-            border: 2px dashed #e4bdc2;
-        }
-        .soft-shadow {
-            box-shadow: 0 8px 30px rgba(184, 0, 73, 0.08);
-        }
-        /* Barra de rolagem */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #b80049;
-            border-radius: 10px;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #fbf9f8 0%, #fef5f2 100%); color: #1b1c1c; scroll-behavior: smooth; }
+        h1, h2, h3, .font-serif { font-family: 'Playfair Display', serif; }
+        .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-up { animation: fadeUp 0.6s ease-out forwards; }
+        @keyframes growWidth { from { width: 0%; } to { width: var(--final-width); } }
+        .animate-grow { animation: growWidth 0.8s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards; width: 0% !important; }
+        .hover-lift { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .hover-lift:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -12px rgba(184, 0, 73, 0.15); }
+        .btn-ripple { position: relative; overflow: hidden; transition: all 0.2s; }
+        .btn-ripple:active { transform: scale(0.96); }
+        .stitching-border { border: 2px dashed #e4bdc2; }
+        .soft-shadow { box-shadow: 0 8px 30px rgba(184, 0, 73, 0.08); }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #b80049; border-radius: 10px; }
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; padding: 0; margin: 0; }
+            .max-w-container { max-width: 100% !important; }
         }
     </style>
 </head>
 <body>
 
-    <!-- NAVEGAÇÃO GLASS -->
-    <nav class="sticky top-0 z-50 glass border-b border-white/30 backdrop-blur-md">
+    <nav class="sticky top-0 z-50 glass border-b border-white/30 backdrop-blur-md no-print">
         <div class="max-w-[1280px] mx-auto px-4 md:px-6 py-4 flex justify-between items-center">
             <span class="text-2xl md:text-3xl font-bold text-[#b80049] tracking-tight font-serif">Tailored Influence</span>
             <div class="hidden md:flex gap-8 items-center">
                 <a href="#portfolio" class="text-[#1b1c1c] hover:text-[#b80049] font-medium transition">Portfólio</a>
                 <a href="#metricas" class="text-[#1b1c1c] hover:text-[#b80049] font-medium transition">Métricas</a>
                 <a href="#contato" class="text-[#1b1c1c] hover:text-[#b80049] font-medium transition">Contato</a>
-                <button class="bg-[#b80049] text-white px-6 py-2 rounded-full font-bold hover:bg-[#9c003e] transition shadow-md btn-ripple">Baixar Kit</button>
+                <button onclick="baixarPDF()" class="bg-[#b80049] text-white px-6 py-2 rounded-full font-bold hover:bg-[#9c003e] transition shadow-md btn-ripple">Baixar Kit (PDF)</button>
             </div>
         </div>
     </nav>
 
-    <!-- CONTEÚDO PRINCIPAL -->
     <main class="max-w-[1280px] mx-auto px-4 md:px-6 py-8" id="conteudo-principal">
         <div class="flex justify-center items-center py-20">
             <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#b80049]"></div>
@@ -110,14 +54,13 @@
         </div>
     </main>
 
-    <!-- RODAPÉ -->
-    <footer class="bg-white/50 backdrop-blur-sm border-t border-[#e4bdc2] mt-12" id="contato">
+    <footer class="bg-white/50 backdrop-blur-sm border-t border-[#e4bdc2] mt-12 no-print" id="contato">
         <div class="max-w-[1280px] mx-auto px-4 md:px-6 py-12">
             <div class="flex flex-col md:flex-row justify-between items-start gap-12">
                 <div class="space-y-4 max-w-sm">
                     <h4 class="text-2xl text-[#b80049] tracking-tight font-serif" id="footer-nome">Rose Gerçóssimo</h4>
                     <p class="text-[#5b3f43]" id="footer-bio"></p>
-                    <div class="flex gap-4" id="social-icons"></div>
+                    <div class="flex gap-4" id="social-icons-footer"></div>
                 </div>
                 <div class="space-y-4">
                     <h5 class="text-xs font-bold tracking-wider text-[#b80049] uppercase">Contato direto</h5>
@@ -127,7 +70,7 @@
                     </ul>
                 </div>
             </div>
-            <div class="mt-12 pt-8 border-t border-[#efeded] text-center text-sm text-[#5d5f5f]">© 2025 Tailored Influence · Todos os direitos reservados · Feito com ♥ para Rose</div>
+            <div class="mt-12 pt-8 border-t border-[#efeded] text-center text-sm text-[#5d5f5f]">© 2025 Tailored Influence · Todos os direitos reservados</div>
         </div>
     </footer>
 
@@ -151,7 +94,7 @@
 
                 const main = document.getElementById('conteudo-principal');
                 main.innerHTML = `
-                    <!-- Hero Section com animação -->
+                    <!-- Hero Section -->
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-16 items-center animate-fade-up">
                         <div class="lg:col-span-5 relative group">
                             <div class="absolute -inset-3 bg-gradient-to-r from-[#b80049]/20 to-[#e4bdc2]/40 rounded-full blur-2xl animate-pulse"></div>
@@ -167,14 +110,20 @@
                                 <p class="text-xl md:text-2xl text-[#5b3f43] font-medium leading-relaxed">${escapeHtml(config.bio_curta)}</p>
                             </div>
                             <div class="flex flex-wrap gap-3">
-                                <div class="px-5 py-2.5 bg-[#b80049]/10 rounded-full text-[#b80049] font-bold flex items-center gap-2 backdrop-blur-sm"><span class="material-symbols-outlined">stars</span> ${escapeHtml(config.tag1)}</div>
-                                <div class="px-5 py-2.5 bg-[#b80049]/10 rounded-full text-[#b80049] font-bold flex items-center gap-2 backdrop-blur-sm"><span class="material-symbols-outlined">auto_graph</span> ${escapeHtml(config.tag2)}</div>
+                                <div class="px-5 py-2.5 bg-[#b80049]/10 rounded-full text-[#b80049] font-bold flex items-center gap-2"><span class="material-symbols-outlined">stars</span> ${escapeHtml(config.tag1)}</div>
+                                <div class="px-5 py-2.5 bg-[#b80049]/10 rounded-full text-[#b80049] font-bold flex items-center gap-2"><span class="material-symbols-outlined">auto_graph</span> ${escapeHtml(config.tag2)}</div>
+                            </div>
+                            <!-- Ícones sociais na hero -->
+                            <div class="flex gap-4 mt-4">
+                                <a href="${escapeHtml(config.youtube_url)}" target="_blank" class="w-12 h-12 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition-all duration-200 shadow-md"><span class="material-symbols-outlined text-2xl">smart_display</span></a>
+                                <a href="${escapeHtml(config.instagram_url)}" target="_blank" class="w-12 h-12 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition-all duration-200 shadow-md"><span class="material-symbols-outlined text-2xl">photo_camera</span></a>
+                                <a href="${escapeHtml(config.tiktok_url)}" target="_blank" class="w-12 h-12 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition-all duration-200 shadow-md"><span class="material-symbols-outlined text-2xl">music_note</span></a>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Vídeo do YouTube -->
-                    ${config.youtube_video_id && config.youtube_video_id !== 'dQw4w9WgXcQ' ? `
+                    <!-- Vídeo do YouTube (se existir) -->
+                    ${config.youtube_video_id && config.youtube_video_id !== '' ? `
                     <div class="mb-16 animate-fade-up" style="animation-delay: 0.1s">
                         <h3 class="text-2xl md:text-3xl text-[#b80049] mb-5 font-serif flex items-center gap-2"><span class="material-symbols-outlined">smart_display</span> Vídeo em destaque</h3>
                         <div class="aspect-video w-full rounded-2xl overflow-hidden shadow-2xl border border-white/50">
@@ -183,9 +132,9 @@
                     </div>
                     ` : ''}
 
-                    <!-- Métricas Grid -->
+                    <!-- Métricas -->
                     <div id="metricas" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-                        <div class="bg-white/80 backdrop-blur-sm p-6 rounded-2xl soft-shadow border border-white/50 hover-lift transition-all duration-300">
+                        <div class="bg-white/80 backdrop-blur-sm p-6 rounded-2xl soft-shadow border border-white/50 hover-lift">
                             <div class="flex justify-between"><span class="material-symbols-outlined text-[#b80049] text-4xl">brand_family</span><span class="text-xs font-bold uppercase tracking-wider text-[#5d5f5f]">TikTok Impacto</span></div>
                             <div class="mt-8"><div class="text-4xl font-black text-[#b80049]">${escapeHtml(config.tiktok_views)}</div><div class="text-[#5d5f5f] text-sm mt-1">${escapeHtml(config.tiktok_desc)}</div></div>
                             <div class="w-full h-1.5 bg-[#efeded] mt-5 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-[#b80049] to-[#e4bdc2] rounded-full" style="--final-width: ${config.tiktok_percent}%; width:0%" data-width="${config.tiktok_percent}"></div></div>
@@ -257,21 +206,33 @@
                     bar.classList.add('animate-grow');
                 });
 
-                // Rodapé e redes sociais
+                // Rodapé
                 document.getElementById('footer-nome').innerText = config.nome_profissional;
                 document.getElementById('footer-bio').innerText = config.sub_nome;
                 document.getElementById('footer-email').innerText = config.email_contato;
                 document.getElementById('footer-phone').innerText = config.telefone_contato;
 
-                const socialDiv = document.getElementById('social-icons');
-                socialDiv.innerHTML = `
-                    <a href="${escapeHtml(config.youtube_url)}" target="_blank" class="w-10 h-10 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition-all duration-200"><span class="material-symbols-outlined">smart_display</span></a>
-                    <a href="${escapeHtml(config.instagram_url)}" target="_blank" class="w-10 h-10 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition-all duration-200"><span class="material-symbols-outlined">photo_camera</span></a>
-                    <a href="${escapeHtml(config.tiktok_url)}" target="_blank" class="w-10 h-10 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition-all duration-200"><span class="material-symbols-outlined">music_note</span></a>
+                const footerSocial = document.getElementById('social-icons-footer');
+                footerSocial.innerHTML = `
+                    <a href="${escapeHtml(config.youtube_url)}" target="_blank" class="w-10 h-10 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition"><span class="material-symbols-outlined">smart_display</span></a>
+                    <a href="${escapeHtml(config.instagram_url)}" target="_blank" class="w-10 h-10 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition"><span class="material-symbols-outlined">photo_camera</span></a>
+                    <a href="${escapeHtml(config.tiktok_url)}" target="_blank" class="w-10 h-10 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition"><span class="material-symbols-outlined">music_note</span></a>
                 `;
             } catch (err) {
-                document.getElementById('conteudo-principal').innerHTML = `<div class="text-red-500 text-center p-10">Erro ao carregar dados: ${err.message}</div>`;
+                document.getElementById('conteudo-principal').innerHTML = `<div class="text-red-500 text-center p-10">Erro: ${err.message}</div>`;
             }
+        }
+
+        function baixarPDF() {
+            const element = document.getElementById('conteudo-principal');
+            const opt = {
+                margin: [0.5, 0.5, 0.5, 0.5],
+                filename: 'media-kit-rose.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, letterRendering: true },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
         }
 
         function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
