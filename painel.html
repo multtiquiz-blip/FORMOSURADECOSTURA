@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Painel de Controle | Rose Gerçóssimo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+
+    <div class="max-w-md mx-auto bg-white p-6 rounded-xl shadow-md">
+        <h1 class="text-2xl font-bold text-[#b80049] mb-6">Painel de Edição</h1>
+        
+        <div class="mb-4">
+            <label class="block text-sm font-bold mb-1">Nome:</label>
+            <input id="input-nome" type="text" class="w-full border rounded p-2" placeholder="Rose Gerçóssimo">
+        </div>
+
+        <div class="mb-6">
+            <label class="block text-sm font-bold mb-1">TikTok Views:</label>
+            <input id="input-tiktok" type="text" class="w-full border rounded p-2" placeholder="3.4M">
+        </div>
+
+        <button id="btn-salvar" class="w-full bg-[#b80049] text-white py-3 rounded-lg font-bold">
+            Salvar Alterações
+        </button>
+    </div>
+
+    <script>
+        document.getElementById('btn-salvar').addEventListener('click', () => {
+            const nome = document.getElementById('input-nome').value;
+            const tiktok = document.getElementById('input-tiktok').value;
+
+            // Salva no localStorage
+            localStorage.setItem('rose_nome', nome);
+            localStorage.setItem('tiktok_views', tiktok);
+
+            alert('Dados salvos com sucesso, papai!');
+        });
+    </script>
+</body>
+</html>
