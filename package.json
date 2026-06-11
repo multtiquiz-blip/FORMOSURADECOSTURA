@@ -1,0 +1,11 @@
+{
+  "name": "formosa-de-costura",
+  "version": "1.0.0",
+  "description": "Midia Kit e Painel de Controle - Rose Gercóssimo",
+  "scripts": {
+    "build": "echo 'Preparando o ambiente...'",
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
