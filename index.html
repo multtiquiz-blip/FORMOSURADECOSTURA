@@ -1,60 +1,397 @@
+
 <!DOCTYPE html>
-<html class="light" lang="pt-BR">
-<head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Mídia Kit | Rose Gerçóssimo</title>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-    <style>
-        .bento-shadow { box-shadow: 0 4px 20px rgba(184, 0, 73, 0.05); }
-        .glass-card { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); }
+
+<html class="light" lang="pt-br"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Dashboard Editável - Rose Gerçóssimo</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&amp;family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-fixed": "#1a1c1c",
+                    "outline": "#8f6f73",
+                    "error-container": "#ffdad6",
+                    "on-primary-fixed": "#400014",
+                    "surface-container": "#efeded",
+                    "on-background": "#1b1c1c",
+                    "surface-container-highest": "#e4e2e2",
+                    "surface-container-low": "#f5f3f3",
+                    "on-tertiary-fixed": "#191c1d",
+                    "on-tertiary-container": "#fcfdfe",
+                    "tertiary-container": "#737576",
+                    "outline-variant": "#e4bdc2",
+                    "inverse-on-surface": "#f2f0f0",
+                    "on-surface": "#1b1c1c",
+                    "secondary-fixed": "#e2e2e2",
+                    "surface-container-high": "#eae8e7",
+                    "on-secondary-fixed-variant": "#454747",
+                    "tertiary-fixed": "#e1e3e4",
+                    "surface": "#fbf9f8",
+                    "surface-bright": "#fbf9f8",
+                    "primary-container": "#e2165f",
+                    "surface-dim": "#dbd9d9",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "secondary-container": "#dfe0e0",
+                    "on-surface-variant": "#5b3f43",
+                    "on-secondary-container": "#616363",
+                    "inverse-primary": "#ffb2be",
+                    "error": "#ba1a1a",
+                    "inverse-surface": "#303030",
+                    "tertiary": "#5a5c5d",
+                    "surface-tint": "#bc004b",
+                    "surface-variant": "#e4e2e2",
+                    "primary": "#b80049",
+                    "primary-fixed": "#ffd9de",
+                    "on-primary-container": "#fffbff",
+                    "tertiary-fixed-dim": "#c5c7c8",
+                    "secondary": "#5d5f5f",
+                    "surface-container-lowest": "#ffffff",
+                    "on-tertiary-fixed-variant": "#454748",
+                    "on-error-container": "#93000a",
+                    "background": "#fbf9f8",
+                    "secondary-fixed-dim": "#c6c6c7",
+                    "primary-fixed-dim": "#ffb2be",
+                    "on-primary": "#ffffff",
+                    "on-error": "#ffffff",
+                    "on-primary-fixed-variant": "#900038"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-mobile": "16px",
+                    "unit": "8px",
+                    "container-max": "1280px",
+                    "bento-gap": "16px",
+                    "gutter": "24px"
+            },
+            "fontFamily": {
+                    "headline-md": ["Playfair Display"],
+                    "body-md": ["Inter"],
+                    "label-caps": ["Inter"],
+                    "display-lg-mobile": ["Playfair Display"],
+                    "headline-sm": ["Playfair Display"],
+                    "body-lg": ["Inter"],
+                    "metric-num": ["Inter"],
+                    "display-lg": ["Playfair Display"]
+            },
+            "fontSize": {
+                    "headline-md": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "600"}],
+                    "display-lg-mobile": ["32px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                    "headline-sm": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "metric-num": ["28px", {"lineHeight": "1", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .stitching-border {
+            border: 2px dashed #e4bdc2;
+        }
+        .stitching-line {
+            background-image: linear-gradient(to right, #e4bdc2 50%, transparent 50%);
+            background-size: 8px 2px;
+            background-repeat: repeat-x;
+            height: 2px;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(228, 189, 194, 0.3);
+        }
+        .ambient-shadow {
+            box-shadow: 0 4px 20px rgba(184, 0, 73, 0.05);
+        }
     </style>
 </head>
-<body class="bg-[#fbf9f8] text-[#1b1c1c] font-['Inter']">
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col">
+<!-- Top Navigation -->
+<nav class="sticky top-0 z-50 bg-surface/80 backdrop-blur-md border-b border-dashed border-outline-variant w-full shadow-sm shadow-primary/5">
+<div class="flex justify-between items-center w-full px-margin-mobile md:px-gutter max-w-container-max mx-auto py-4">
+<div class="flex items-center gap-4">
+<span class="font-headline-md text-headline-md font-bold text-primary tracking-tight">Tailored Influence</span>
+</div>
+<div class="hidden md:flex items-center gap-8">
+<a class="text-primary font-bold border-b-2 border-primary font-body-md" href="#">Portfolio</a>
+<a class="text-secondary hover:text-primary transition-colors font-body-md" href="#">Metrics</a>
+<a class="text-secondary hover:text-primary transition-colors font-body-md" href="#">Partnerships</a>
+<a class="text-secondary hover:text-primary transition-colors font-body-md" href="#">Contact</a>
+<button class="bg-primary text-on-primary px-6 py-2 rounded-full font-bold active:scale-95 transition-all">Download Kit</button>
+</div>
+<button class="md:hidden text-primary">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+</nav>
+<main class="flex-grow w-full max-w-container-max mx-auto px-margin-mobile md:px-gutter py-8">
+<!-- Hero Section -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-bento-gap mb-12 items-center">
+<div class="lg:col-span-5 relative group">
+<div class="absolute -inset-2 bg-primary/10 rounded-full blur-xl opacity-50 group-hover:opacity-75 transition-opacity"></div>
+<div class="relative w-full aspect-square rounded-full overflow-hidden border-4 border-white shadow-xl">
+<!-- EDITABLE: Profile Image -->
+<img alt="Rose Gerçóssimo" class="profile-image w-full h-full object-cover" data-alt="A professional portrait of Rose Gerçóssimo..." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDI9yOGPomy1NpvzSvgxzVfQycjvGXP9WwUh7DKE38Uvf5R3a4w3HB7dduj71_oZIbPBBD0TehnKpexlufsFyfyLAnTgDo4qS3CiwJVNEbrj7fa5I22ygbrBTK72GE-XfGl-DXsqI_N4GClDKnfp6upfLzkYQUyQbnjaXPDBkPKPrpp_tf0xLp1u2YsAUzTWManOefwXBijIwsWBg3foBmY74ajVV94eGn45kbcVeLdWqc7NKa_gbYrADYMev3fPRpVmwehbWTSWNrB12k"/>
+</div>
+<div class="absolute bottom-4 right-4 bg-primary text-on-primary p-4 rounded-full shadow-lg">
+<span class="material-symbols-outlined text-4xl">verified</span>
+</div>
+</div>
+<div class="lg:col-span-7 space-y-6"><!-- EDITABLE: Name and Bio Section -->
+<div>
+<h1 class="font-display-lg text-display-lg text-primary leading-none mb-2">Rose Gerçóssimo</h1>
+<h2 class="font-headline-sm text-headline-sm text-secondary italic">Formosa de Costura</h2>
+<div class="stitching-line mt-4 mb-6"></div>
+<p class="font-headline-sm text-headline-sm text-on-surface-variant font-medium">Mídia Kit: Dashboard de Autoridade Global</p>
+</div>
+<div class="flex flex-wrap gap-4">
+<div class="px-4 py-2 bg-primary/10 rounded-full text-primary font-bold flex items-center gap-2">
+<span class="material-symbols-outlined">stars</span> Expert em Costura Criativa
+                    </div>
+<div class="px-4 py-2 bg-primary/10 rounded-full text-primary font-bold flex items-center gap-2">
+<span class="material-symbols-outlined">auto_graph</span> Impacto Multiplataforma
+                    </div>
+</div>
+</div>
+</section>
+<!-- Bento Metrics Grid -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-bento-gap mb-12"><!-- EDITABLE: Metrics Bento Grid -->
+<!-- TikTok Impact -->
+<div class="bg-white p-6 rounded-xl ambient-shadow border border-surface-container flex flex-col justify-between hover:translate-y-[-4px] transition-transform">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-primary text-3xl">brand_family</span>
+<span class="text-label-caps font-label-caps text-secondary">TikTok Impact</span>
+</div>
+<div class="mt-8">
+<h3 class="font-metric-num text-metric-num text-on-surface">3.4M</h3>
+<p class="font-body-md text-secondary">Visualizações Mensais</p>
+</div>
+<div class="w-full h-1 bg-surface-container mt-4 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[85%] animate-grow"></div>
+</div>
+</div>
+<!-- Reels Reach -->
+<div class="bg-white p-6 rounded-xl ambient-shadow border border-surface-container flex flex-col justify-between hover:translate-y-[-4px] transition-transform">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-primary text-3xl">movie_edit</span>
+<span class="text-label-caps font-label-caps text-secondary">Reels Reach</span>
+</div>
+<div class="mt-8">
+<h3 class="font-metric-num text-metric-num text-on-surface">3.3M</h3>
+<p class="font-body-md text-secondary">Engajamento Orgânico</p>
+</div>
+<div class="w-full h-1 bg-surface-container mt-4 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[78%] animate-grow"></div>
+</div>
+</div>
+<!-- Active Community -->
+<div class="bg-white p-6 rounded-xl ambient-shadow border border-surface-container flex flex-col justify-between hover:translate-y-[-4px] transition-transform">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-primary text-3xl">groups</span>
+<span class="text-label-caps font-label-caps text-secondary">Community</span>
+</div>
+<div class="mt-8">
+<h3 class="font-metric-num text-metric-num text-on-surface">37k+</h3>
+<p class="font-body-md text-secondary">Seguidores Ativos</p>
+</div>
+<div class="flex mt-4 -space-x-2">
+<div class="w-8 h-8 rounded-full border-2 border-white bg-secondary-container"></div>
+<div class="w-8 h-8 rounded-full border-2 border-white bg-primary-container"></div>
+<div class="w-8 h-8 rounded-full border-2 border-white bg-tertiary-container"></div>
+<div class="w-8 h-8 rounded-full border-2 border-white flex items-center justify-center bg-primary text-[10px] text-white">+</div>
+</div>
+</div>
+<!-- Featured Live Card -->
+<div class="bg-primary text-on-primary p-6 rounded-xl shadow-lg shadow-primary/20 flex flex-col justify-between col-span-1 md:col-span-2 lg:col-span-1 border-2 border-white/20">
+<div>
+<div class="flex justify-between items-start mb-4">
+<span class="material-symbols-outlined text-3xl">podcasts</span>
+<span class="px-2 py-1 bg-white/20 rounded text-[10px] uppercase font-bold tracking-widest">Destaque</span>
+</div>
+<h3 class="font-metric-num text-metric-num">100k+</h3>
+<p class="text-on-primary/90 font-label-caps text-label-caps">Visualizações em Live</p>
+</div>
+<p class="mt-4 text-sm leading-snug">Autoridade em Retenção: Prova de que a Rose não apenas atrai, ela ensina e fideliza.</p>
+</div>
+</section>
+<!-- Audience & Insights -->
+<section class="grid grid-cols-1 lg:grid-cols-2 gap-bento-gap mb-12"><!-- EDITABLE: Audience Insights and Value Proposition -->
+<!-- Audience Demographics -->
+<div class="bg-white p-8 rounded-xl ambient-shadow border border-surface-container relative overflow-hidden">
+<div class="absolute top-0 right-0 p-4 opacity-5">
+<span class="material-symbols-outlined text-[120px]">analytics</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-primary mb-8 flex items-center gap-3">
+<span class="material-symbols-outlined">pie_chart</span> Audience Insights
+                </h3>
+<div class="grid grid-cols-2 gap-8">
+<div class="space-y-2">
+<p class="font-label-caps text-label-caps text-secondary">Gênero Dominante</p>
+<div class="flex items-end gap-2">
+<span class="font-metric-num text-metric-num text-primary">98%</span>
+<span class="material-symbols-outlined text-primary mb-1" style='font-variation-settings: "FILL" 1;'>female</span>
+</div>
+<p class="text-sm text-on-surface-variant">Público Feminino</p>
+</div>
+<div class="space-y-2">
+<p class="font-label-caps text-label-caps text-secondary">Faixa Etária</p>
+<div class="flex items-end gap-2">
+<span class="font-metric-num text-metric-num text-primary">28-65</span>
+</div>
+<p class="text-sm text-on-surface-variant">Anos (Poder de Decisão)</p>
+</div>
+</div>
+<div class="mt-10 p-6 bg-surface-container-low rounded-lg border-l-4 border-primary italic">
+<p class="font-body-lg text-body-lg text-on-surface">"Quando a Rose indica, ela não apenas sugere; ela ensina a usar."</p>
+</div>
+</div>
+<!-- Value Proposition -->
+<div class="stitching-border bg-white p-8 rounded-xl flex flex-col justify-center items-center text-center space-y-6">
+<div class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-3xl">shopping_cart_checkout</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface leading-tight">Hub de costura criativa que transforma inspiração em consumo qualificado.</h3>
+<p class="text-secondary max-w-md mx-auto">Uma metodologia didática que conecta a paixão pelo artesanal com resultados comerciais sólidos para marcas parceiras.</p>
+<button class="stitching-border border-primary text-primary px-8 py-3 rounded-full font-bold hover:bg-primary/5 transition-all flex items-center gap-2 group">
+                    Solicitar Proposta Comercial
+                    <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</div>
+</section>
+<!-- Portfolio Preview Grid -->
+<section class="mb-12"><!-- EDITABLE: Portfolio Preview Grid -->
+<h3 class="font-headline-sm text-headline-sm text-primary mb-6">Portfólio Criativo</h3>
+<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+<div class="aspect-square bg-surface-container rounded-lg overflow-hidden relative group">
+<img alt="Bolsa Artesanal" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 portfolio-item-image" data-alt="A close-up shot of a beautifully crafted artisanal fabric bag with intricate floral embroidery, showcasing high-level sewing skill. The bag is placed on a rustic wooden table with soft natural light streaming in, creating a warm, cozy atmosphere. The color palette features rich pinks and soft creams, echoing the brand's aesthetic. The shot emphasizes texture and artisanal detail, reflecting expert craftsmanship." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBt27hBCLueVDz4UU6wJrL6w2TB53-ewaZPg8josEGgpSmfcUjFI4FRxhRgdhhS1S8foiRmA6xQGhSuMt6lKcdV9ScmVY_EsRqF6bkFxo20hLi8RaJ5tIU5uAz3Fp0PAaoJxTmgRSACyWcWrXMKhtREUuJFveL3cKafxFo_HThivJ_M54YgMrZFtfvYICV5K8JsBXRPSNZaICzr4BIFGpnXFEKnJLgt0JgQ4bjGfiPCr7v9L7by50Ie4byLcqShMJzgR5v7cylZijvx"/>
+<div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-4">
+<span class="text-white text-[10px] font-bold uppercase tracking-widest text-center">Bolsa Exclusiva</span>
+</div>
+</div>
+<div class="aspect-square bg-surface-container rounded-lg overflow-hidden relative group">
+<img alt="Vestido sob medida" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 portfolio-item-image" data-alt="A fashion editorial shot of a woman wearing a modern, tailored dress made from high-quality pink linen fabric. She is standing in a brightly lit, minimalist studio with subtle shadows cast by large windows. The overall mood is sophisticated and professional, highlighting the intersection of high fashion and bespoke tailoring. The lighting is crisp and clean, creating a premium digital atelier feel." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBfAkjZScd4EtrgYUk2_XkdnYsNwJM-GmBc9KQggPXdNpqCfqlkMRf3z0Pko7G7UZ5EdUhsdHqUeMdQnuSOz3sljhrRBomI6OS3IsvHTZSMG_HG8FxB5Do3F2tTnSmp61YhljnNWOyECm1tf9Bwrz_X1SLrlFnV_niW6xxFGB7wHeDhjC96AhZyJ0UdApQ_WyW--ZL1uptFxqgGadKSyqyxSsTPsszb8wKj92rU490X9nwb0mbQbX2ZrQE4REbAaQYelxEdU4t78Ie0"/>
+<div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-4">
+<span class="text-white text-[10px] font-bold uppercase tracking-widest text-center">Peça sob Medida</span>
+</div>
+</div>
+<div class="aspect-square bg-surface-container rounded-lg overflow-hidden relative group">
+<img alt="Acessórios Criativos" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 portfolio-item-image" data-alt="A collection of vibrant textile accessories like colorful pouches and fabric-covered headbands, artistically arranged on a light gray surface. The shot is taken from a top-down perspective with soft, diffused lighting that highlights the textures of the various fabrics. The aesthetic is playful yet organized, suggesting a professional sewing workshop where creativity meets precision. Subtle pink accents unify the composition." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1in-_l1CoEUXN802scKYUvHI-HnM8HTRcHO_HXHtIIdWnf7lHEnTY2pFvZGACLXMpJniVpCKLJ4WBwQYU2fsGUHs-y3u82pWzK_XS6FIlqVjIdFhPLo3pg5yRMsNFJYd8Im7oxhUD3sC4cQJmypVwTLbwr1V5cTcG6pMqrVmolTsAoLeflPHHra-sNNWuixNO5glsPEEUHgrJqxChOBCv6Dd9wXeeIe3Q5ODjPzXR4nj8nzA_39KU1j9xWPFoRI_aCBVoMY_WDjzB"/>
+<div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-4">
+<span class="text-white text-[10px] font-bold uppercase tracking-widest text-center">Acessórios</span>
+</div>
+</div>
+<div class="aspect-square bg-surface-container rounded-lg overflow-hidden relative group">
+<img alt="Decoração Têxtil" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 portfolio-item-image" data-alt="A high-end interior setting featuring decorative textile elements such as custom-sewn cushions and a textured wall hanging. The space is filled with natural light and features a minimalist color scheme with soft pastel tones and deep pink highlights. The photography is clean and airy, evoking a sense of calm, expert authority and vibrantly creative living. The scene looks like it belongs in a premium home decor magazine." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWhmYV0vtcr266wuK4HzXOwYOEg0Sr5yb6ObOC0NJ-idsFrYrkNqmbLy8lfJy-XCvegZ3aRPmz9hYxafl4aMk7HvxRQwQP1HwHkJzum8NDmXqazmnuSvRZPCgVosm8e2LB6rEb7aTjqf4XzI9Q_XokM-nNqkYdTXEc5flQinQlgmM4X2E8g5vgHD2h-GfDzHJZlPub5kA-i9v_AsdIepvPC0w2tjlzetMWhrTxoy81KEH8uExsV8QEZux33RuKzU36NllINKOVbbH8"/>
+<div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-4">
+<span class="text-white text-[10px] font-bold uppercase tracking-widest text-center">Decoração</span>
+</div>
+</div>
+<div class="aspect-square bg-surface-container rounded-lg overflow-hidden relative group">
+<img alt="Projeto Infantil" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 portfolio-item-image" data-alt="A whimsical display of children's apparel and fabric toys, all handcrafted with delicate stitching and high-quality materials. The items are shown in a bright, cheerful setting with soft shadows and high-key lighting. The style is charming and artistic, showcasing the 'soul' of sewing through detailed, heart-felt creations. The color palette is dominated by soft whites and vibrant pinks." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCUoJVLMQxXT7Pu08x05tC8TOeDLg4GPW0EMfB-FuKvoeH64PRQkmUmjNGFaySfV19QvkFgDNs0VAxHiyiRAtRWA9h0q6CV20cmwQiiumHBkGNzGpjf5tky6SMB-vFaYr91j4x4MK82sC8SyPYYQo4jPrJbJ3joepKT4AvGHJ1AlxzYBO7uPV5hBI93dI8kvU1bdC_KqiMJD-fKW3ldqBtzCJtGLg8yumOqzQQITV-m8HrtKRuIIzYOz3EaCfpmJp6J3yFfoMNkoPHZ"/>
+<div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-4">
+<span class="text-white text-[10px] font-bold uppercase tracking-widest text-center">Infantil</span>
+</div>
+</div>
+<div class="aspect-square bg-surface-container rounded-lg overflow-hidden relative group">
+<img alt="Coleção Têxtil" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 portfolio-item-image" data-alt="An artistic close-up of different fabric swatches and spools of thread neatly organized on a tailor's workbench. The image emphasizes the materiality and quality of the fabrics, with a shallow depth of field that keeps the foreground in sharp focus. The lighting is artisanal and warm, reflecting a premium digital atelier environment where detail is paramount. Dashed lines and stitching patterns are subtly visible in the background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYQeORVgtb6vkKG-5mPgL12PCl9mO0zccPqv79h3ePscmHdS4xhdbzwt-NBqC5cO40BTJcoK4Es0XUWc4V_R675H7LJ7dP0d7Qzlv8RRvPl09uxVTRlmICS0fqul-9JDDajiOqNAEepToBXA0pLx3ayhz4XSFN8KZh6X9MGS-C6dANtrr3p1gkaA9oiU0WB-4LyFmsEkr6NsALC2LrdL4vJgJJ6yCdpOFTW23DtolkDE-n2_lCINnHF1U75Md7yXLWdX1gA6GLdEWU"/>
+<div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-4">
+<span class="text-white text-[10px] font-bold uppercase tracking-widest text-center">Produção</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-12 px-margin-mobile md:px-gutter max-w-container-max mx-auto border-t border-dashed border-outline-variant mt-auto">
+<div class="flex flex-col md:flex-row justify-between items-start gap-12">
+<div class="space-y-4 max-w-sm">
+<h4 class="font-headline-sm text-headline-sm text-primary tracking-tight">Rose Gerçóssimo</h4>
+<p class="text-on-surface-variant font-body-md">Transformando a paixão pela costura em autoridade global e resultados reais para marcas.</p>
+<div class="flex gap-4">
+<a class="w-10 h-10 rounded-full bg-primary/5 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined">brand_family</span>
+</a>
+<a class="w-10 h-10 rounded-full bg-primary/5 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined">photo_camera</span>
+</a>
+<a class="w-10 h-10 rounded-full bg-primary/5 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined">play_circle</span>
+</a>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-12 w-full md:w-auto">
+<div class="space-y-4">
+<h5 class="font-label-caps text-label-caps text-primary">Contatos Diretos</h5>
+<ul class="space-y-2">
+<li class="flex items-center gap-2 text-on-surface-variant hover:text-primary cursor-pointer transition-colors">
+<span class="material-symbols-outlined text-sm">mail</span>
+                            contato@formosuradecostura.com
+                        </li>
+<li class="flex items-center gap-2 text-on-surface-variant hover:text-primary cursor-pointer transition-colors">
+<span class="material-symbols-outlined text-sm">call</span>
+                            (11) 99999-9999
+                        </li>
+</ul>
+</div>
+<div class="space-y-4">
+<h5 class="font-label-caps text-label-caps text-primary">Links Rápidos</h5>
+<ul class="space-y-2">
+<li class="text-on-surface-variant hover:text-primary cursor-pointer transition-colors">Portfólio 2024</li>
+<li class="text-on-surface-variant hover:text-primary cursor-pointer transition-colors">Press Assets</li>
+<li class="text-on-surface-variant hover:text-primary cursor-pointer transition-colors">Privacy Policy</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="mt-12 pt-8 border-t border-surface-container flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-secondary">
+<p class="">© 2024 Tailored Influence. All rights reserved. Handcrafted with precision.</p>
+<div class="flex gap-6">
+<a class="hover:text-primary transition-colors" href="#">Termos</a>
+<a class="hover:text-primary transition-colors" href="#">Cookies</a>
+</div>
+</div>
+</footer>
+<script>
+        // Micro-interactions for buttons and cards
+        document.querySelectorAll('.active\\:scale-95').forEach(button => {
+            button.addEventListener('mousedown', () => button.style.transform = 'scale(0.95)');
+            button.addEventListener('mouseup', () => button.style.transform = 'scale(1)');
+            button.addEventListener('mouseleave', () => button.style.transform = 'scale(1)');
+        });
 
-    <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-dashed border-[#e4bdc2] py-4">
-        <div class="max-w-6xl mx-auto px-4 flex justify-between items-center">
-            <h1 class="font-['Playfair_Display'] text-2xl font-bold text-[#b80049]">Tailored Influence</h1>
-            <button class="bg-[#b80049] text-white px-6 py-2 rounded-full font-bold text-sm">Download Kit</button>
-        </div>
-    </header>
+        // Add subtle animation to progress bars on scroll
+        const observerOptions = {
+            threshold: 0.5
+        };
 
-    <main class="max-w-6xl mx-auto px-4 py-12">
-        <section class="text-center mb-16">
-            <div class="w-40 h-40 mx-auto rounded-full overflow-hidden border-4 border-white bento-shadow mb-6">
-                <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCANRCad81BmYLkmaKRd1IFvwSFPGS7LSDt6cRkgfkgoXoPVH1J2W7h8f7HN_dTUqEJaI03_dVCyRxBTXPLVu-W4rxmu57EUb6O_wYLYYZO3QXVqph7cvRHwFipkt3y3eNgCqHZc9LipWl7RSEC9FyYNuNkJpVZWmn1K8VIyjAOeCcO8eNLTbKsHVfHDxlAfCGQA-QMzxl6ou1CLQKQv1vo69_AgXlFkYBaK95d715mB358dYQxbuLiaD6A0VVyxOtyX35bb1_LZigX" alt="Rose Gerçóssimo" class="w-full h-full object-cover"/>
-            </div>
-            <h2 id="display-nome" class="font-['Playfair_Display'] text-4xl text-[#b80049] font-bold">Rose Gerçóssimo</h2>
-            <p class="text-xl italic text-[#5d5f5f]">Formosa de Costura</p>
-        </section>
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-grow');
+                }
+            });
+        }, observerOptions);
 
-        <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-            <div class="glass-card p-6 rounded-xl border border-[#e4bdc2]/30 text-center">
-                <p class="text-sm uppercase tracking-widest text-[#5d5f5f] mb-2">TikTok Views</p>
-                <p id="display-tiktok" class="text-4xl font-bold text-[#b80049]">3.4M</p>
-            </div>
-            <div class="glass-card p-6 rounded-xl border border-[#e4bdc2]/30 text-center">
-                <p class="text-sm uppercase tracking-widest text-[#5d5f5f] mb-2">Reels Reach</p>
-                <p id="display-reels" class="text-4xl font-bold text-[#b80049]">3.3M</p>
-            </div>
-            <div class="glass-card p-6 rounded-xl border border-[#e4bdc2]/30 text-center">
-                <p class="text-sm uppercase tracking-widest text-[#5d5f5f] mb-2">Comunidade</p>
-                <p id="display-comunidade" class="text-4xl font-bold text-[#b80049]">37k+</p>
-            </div>
-        </section>
-    </main>
-
-    <script>
-        // Carrega os dados salvos no painel
-        window.addEventListener('load', () => {
-            const nome = localStorage.getItem('rose_nome');
-            const tiktok = localStorage.getItem('tiktok_views');
-            
-            if (nome) document.getElementById('display-nome').innerText = nome;
-            if (tiktok) document.getElementById('display-tiktok').innerText = tiktok;
+        document.querySelectorAll('.bg-primary.h-full').forEach(bar => {
+            observer.observe(bar);
         });
     </script>
-</body>
-</html>
+</body></html>
