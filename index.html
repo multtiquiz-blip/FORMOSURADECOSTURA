@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html class="light" lang="pt-BR">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Mídia Kit | Rose Gerçóssimo</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <style>
+        .bento-shadow { box-shadow: 0 4px 20px rgba(184, 0, 73, 0.05); }
+        .glass-card { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); }
+    </style>
+</head>
+<body class="bg-[#fbf9f8] text-[#1b1c1c] font-['Inter']">
+
+    <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-dashed border-[#e4bdc2] py-4">
+        <div class="max-w-6xl mx-auto px-4 flex justify-between items-center">
+            <h1 class="font-['Playfair_Display'] text-2xl font-bold text-[#b80049]">Tailored Influence</h1>
+            <button class="bg-[#b80049] text-white px-6 py-2 rounded-full font-bold text-sm">Download Kit</button>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-12">
+        <section class="text-center mb-16">
+            <div class="w-40 h-40 mx-auto rounded-full overflow-hidden border-4 border-white bento-shadow mb-6">
+                <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCANRCad81BmYLkmaKRd1IFvwSFPGS7LSDt6cRkgfkgoXoPVH1J2W7h8f7HN_dTUqEJaI03_dVCyRxBTXPLVu-W4rxmu57EUb6O_wYLYYZO3QXVqph7cvRHwFipkt3y3eNgCqHZc9LipWl7RSEC9FyYNuNkJpVZWmn1K8VIyjAOeCcO8eNLTbKsHVfHDxlAfCGQA-QMzxl6ou1CLQKQv1vo69_AgXlFkYBaK95d715mB358dYQxbuLiaD6A0VVyxOtyX35bb1_LZigX" alt="Rose Gerçóssimo" class="w-full h-full object-cover"/>
+            </div>
+            <h2 id="display-nome" class="font-['Playfair_Display'] text-4xl text-[#b80049] font-bold">Rose Gerçóssimo</h2>
+            <p class="text-xl italic text-[#5d5f5f]">Formosa de Costura</p>
+        </section>
+
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+            <div class="glass-card p-6 rounded-xl border border-[#e4bdc2]/30 text-center">
+                <p class="text-sm uppercase tracking-widest text-[#5d5f5f] mb-2">TikTok Views</p>
+                <p id="display-tiktok" class="text-4xl font-bold text-[#b80049]">3.4M</p>
+            </div>
+            <div class="glass-card p-6 rounded-xl border border-[#e4bdc2]/30 text-center">
+                <p class="text-sm uppercase tracking-widest text-[#5d5f5f] mb-2">Reels Reach</p>
+                <p id="display-reels" class="text-4xl font-bold text-[#b80049]">3.3M</p>
+            </div>
+            <div class="glass-card p-6 rounded-xl border border-[#e4bdc2]/30 text-center">
+                <p class="text-sm uppercase tracking-widest text-[#5d5f5f] mb-2">Comunidade</p>
+                <p id="display-comunidade" class="text-4xl font-bold text-[#b80049]">37k+</p>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Carrega os dados salvos no painel
+        window.addEventListener('load', () => {
+            const nome = localStorage.getItem('rose_nome');
+            const tiktok = localStorage.getItem('tiktok_views');
+            
+            if (nome) document.getElementById('display-nome').innerText = nome;
+            if (tiktok) document.getElementById('display-tiktok').innerText = tiktok;
+        });
+    </script>
+</body>
+</html>
