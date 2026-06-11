@@ -1,12 +1,8 @@
 {
   "name": "formosa-de-costura",
   "version": "1.0.0",
-  "description": "Midia Kit e Painel da Rose Gercóssimo",
-  "main": "src/index.html",
+  "private": true,
   "scripts": {
-    "test": "echo \"Erro: nenhum teste especificado\" && exit 1"
-  },
-  "keywords": ["costura", "midiakit", "dashboard"],
-  "author": "Papai",
-  "license": "ISC"
+    "build": "mkdir -p public && cp -r src/* public/"
+  }
 }
