@@ -19,90 +19,68 @@
 </head>
 <body>
 
-    <!-- Barra de navegação superior -->
     <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-dashed border-[#e4bdc2]">
         <div class="max-w-[1280px] mx-auto px-4 md:px-6 py-4 flex justify-between items-center">
             <span class="text-3xl md:text-4xl font-bold text-[#b80049] tracking-tight font-serif">Tailored Influence</span>
-            <div class="hidden md:flex gap-8 items-center">
-                <a href="#" class="text-[#b80049] font-bold border-b-2 border-[#b80049] pb-1">Portfólio</a>
-                <a href="#" class="text-[#5d5f5f] hover:text-[#b80049] transition">Métricas</a>
-                <a href="#" class="text-[#5d5f5f] hover:text-[#b80049] transition">Parcerias</a>
-                <a href="#" class="text-[#5d5f5f] hover:text-[#b80049] transition">Contato</a>
-                <button class="bg-[#b80049] text-white px-6 py-2 rounded-full font-bold hover:opacity-90 transition">Baixar Kit</button>
+            <div class="hidden md:flex gap-8">
+                <a href="#" class="text-[#b80049] font-bold border-b-2 border-[#b80049]">Portfólio</a>
+                <a href="#" class="text-[#5d5f5f] hover:text-[#b80049]">Métricas</a>
+                <a href="#" class="text-[#5d5f5f] hover:text-[#b80049]">Parcerias</a>
+                <button class="bg-[#b80049] text-white px-6 py-2 rounded-full font-bold">Baixar Kit</button>
             </div>
         </div>
     </nav>
 
-    <!-- Conteúdo principal (preenchido dinamicamente) -->
     <main class="max-w-[1280px] mx-auto px-4 md:px-6 py-8" id="conteudo-principal">
-        <div class="text-center py-20 text-[#5d5f5f]">Carregando dados...</div>
+        <div class="text-center py-20 text-[#5d5f5f]">Carregando...</div>
     </main>
 
-    <!-- Rodapé -->
-    <footer class="max-w-[1280px] mx-auto px-4 md:px-6 py-12 border-t border-dashed border-[#e4bdc2] mt-auto">
+    <footer class="max-w-[1280px] mx-auto px-4 md:px-6 py-12 border-t border-dashed border-[#e4bdc2]">
         <div class="flex flex-col md:flex-row justify-between items-start gap-12">
             <div class="space-y-4 max-w-sm">
                 <h4 class="text-2xl text-[#b80049] tracking-tight font-serif" id="footer-nome">Rose Gerçóssimo</h4>
                 <p class="text-[#5b3f43]" id="footer-bio"></p>
-                <div class="flex gap-4">
-                    <a href="#" class="w-10 h-10 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition"><span class="material-symbols-outlined">brand_family</span></a>
-                    <a href="#" class="w-10 h-10 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition"><span class="material-symbols-outlined">photo_camera</span></a>
-                    <a href="#" class="w-10 h-10 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition"><span class="material-symbols-outlined">play_circle</span></a>
+                <div class="flex gap-4" id="social-icons">
+                    <!-- ícones preenchidos via JS -->
                 </div>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-12 w-full md:w-auto">
-                <div class="space-y-4">
-                    <h5 class="text-xs font-bold tracking-wider text-[#b80049] uppercase">Contatos Diretos</h5>
-                    <ul class="space-y-2">
-                        <li class="flex items-center gap-2 text-[#5b3f43]"><span class="material-symbols-outlined text-sm">mail</span> <span id="footer-email"></span></li>
-                        <li class="flex items-center gap-2 text-[#5b3f43]"><span class="material-symbols-outlined text-sm">call</span> <span id="footer-phone"></span></li>
-                    </ul>
-                </div>
-                <div class="space-y-4">
-                    <h5 class="text-xs font-bold tracking-wider text-[#b80049] uppercase">Links Rápidos</h5>
-                    <ul class="space-y-2 text-[#5b3f43]">
-                        <li class="hover:text-[#b80049] cursor-pointer">Portfólio 2025</li>
-                        <li class="hover:text-[#b80049] cursor-pointer">Press Assets</li>
-                        <li class="hover:text-[#b80049] cursor-pointer">Política de Privacidade</li>
-                    </ul>
-                </div>
+            <div class="space-y-4">
+                <h5 class="text-xs font-bold tracking-wider text-[#b80049] uppercase">Contatos</h5>
+                <ul class="space-y-2">
+                    <li class="flex items-center gap-2 text-[#5b3f43]"><span class="material-symbols-outlined text-sm">mail</span> <span id="footer-email"></span></li>
+                    <li class="flex items-center gap-2 text-[#5b3f43]"><span class="material-symbols-outlined text-sm">call</span> <span id="footer-phone"></span></li>
+                </ul>
             </div>
         </div>
         <div class="mt-12 pt-8 border-t border-[#efeded] text-center text-sm text-[#5d5f5f]">© 2025 Tailored Influence. Todos os direitos reservados.</div>
     </footer>
 
     <script>
-       // ==================== DADOS REAIS DO SUPABASE ====================
-const SUPABASE_URL = 'https://nhnhqjyrawaftlomlilg.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5obmhxanlyYXdhZnRsb21saWxnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyMDY3ODgsImV4cCI6MjA5Njc4Mjc4OH0.GtOdh4sLzxrwPxOvnKJO5bf4x4hebpuC9RlR-06V0RE';
-// ==================================================================
+        const SUPABASE_URL = 'https://nhnhqjyrawaftlomlilg.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5obmhxanlyYXdhZnRsb21saWxnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyMDY3ODgsImV4cCI6MjA5Njc4Mjc4OH0.GtOdh4sLzxrwPxOvnKJO5bf4x4hebpuC9RlR-06V0RE';
 
         async function carregarDados() {
             try {
-                // 1. Buscar configurações
                 const configResp = await fetch(`${SUPABASE_URL}/rest/v1/site_config?select=config_key,config_value`, {
                     headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
                 });
-                if (!configResp.ok) throw new Error(`Erro HTTP: ${configResp.status}`);
                 const configArray = await configResp.json();
                 const config = {};
                 configArray.forEach(item => { config[item.config_key] = item.config_value; });
 
-                // 2. Buscar portfólio
                 const portResp = await fetch(`${SUPABASE_URL}/rest/v1/portfolio?select=*&order=ordem`, {
                     headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
                 });
                 const portfolio = await portResp.json();
 
-                // 3. Montar HTML completo (mesmo layout original)
                 const main = document.getElementById('conteudo-principal');
                 main.innerHTML = `
-                    <!-- Seção Hero (foto + nome + bio) -->
-                    <section class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-12 items-center">
+                    <!-- Hero -->
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-12 items-center">
                         <div class="lg:col-span-5 relative group">
-                            <div class="absolute -inset-2 bg-[#b80049]/10 rounded-full blur-xl opacity-50 group-hover:opacity-75 transition"></div>
+                            <div class="absolute -inset-2 bg-[#b80049]/10 rounded-full blur-xl"></div>
                             <div class="relative w-full aspect-square rounded-full overflow-hidden border-4 border-white shadow-xl">
-                                <img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDI9yOGPomy1NpvzSvgxzVfQycjvGXP9WwUh7DKE38Uvf5R3a4w3HB7dduj71_oZIbPBBD0TehnKpexlufsFyfyLAnTgDo4qS3CiwJVNEbrj7fa5I22ygbrBTK72GE-XfGl-DXsqI_N4GClDKnfp6upfLzkYQUyQbnjaXPDBkPKPrpp_tf0xLp1u2YsAUzTWManOefwXBijIwsWBg3foBmY74ajVV94eGn45kbcVeLdWqc7NKa_gbYrADYMev3fPRpVmwehbWTSWNrB12k" alt="Rose">
+                                <img class="w-full h-full object-cover" src="${escapeHtml(config.foto_perfil_url)}" alt="Rose" onerror="this.src='https://placehold.co/600x600?text=Foto'">
                             </div>
                         </div>
                         <div class="lg:col-span-7 space-y-6">
@@ -113,49 +91,53 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
                                 <p class="text-2xl text-[#5b3f43] font-medium">${escapeHtml(config.bio_curta)}</p>
                             </div>
                             <div class="flex flex-wrap gap-3">
-                                <div class="px-4 py-2 bg-[#b80049]/10 rounded-full text-[#b80049] font-bold flex items-center gap-2"><span class="material-symbols-outlined">stars</span> Expert em Costura Criativa</div>
-                                <div class="px-4 py-2 bg-[#b80049]/10 rounded-full text-[#b80049] font-bold flex items-center gap-2"><span class="material-symbols-outlined">auto_graph</span> Impacto Multiplataforma</div>
+                                <div class="px-4 py-2 bg-[#b80049]/10 rounded-full text-[#b80049] font-bold flex items-center gap-2"><span class="material-symbols-outlined">stars</span> ${escapeHtml(config.tag1)}</div>
+                                <div class="px-4 py-2 bg-[#b80049]/10 rounded-full text-[#b80049] font-bold flex items-center gap-2"><span class="material-symbols-outlined">auto_graph</span> ${escapeHtml(config.tag2)}</div>
                             </div>
                         </div>
-                    </section>
+                    </div>
 
-                    <!-- Bloco de métricas (grid 4 itens) -->
-                    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
-                        <div class="bg-white p-6 rounded-xl ambient-shadow border border-[#e4bdc2]/30">
-                            <div class="flex justify-between"><span class="material-symbols-outlined text-[#b80049] text-3xl">brand_family</span><span class="text-xs font-bold tracking-wider uppercase text-[#5d5f5f]">TikTok Impacto</span></div>
+                    <!-- Vídeo YouTube (se tiver ID) -->
+                    ${config.youtube_video_id ? `
+                    <div class="mb-12">
+                        <h3 class="text-2xl text-[#b80049] mb-4">Vídeo em destaque</h3>
+                        <div class="aspect-video w-full rounded-xl overflow-hidden shadow-lg">
+                            <iframe class="w-full h-full" src="https://www.youtube.com/embed/${escapeHtml(config.youtube_video_id)}" frameborder="0" allowfullscreen></iframe>
+                        </div>
+                    </div>
+                    ` : ''}
+
+                    <!-- Métricas -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
+                        <div class="bg-white p-6 rounded-xl ambient-shadow border">
+                            <div class="flex justify-between"><span class="material-symbols-outlined text-[#b80049] text-3xl">brand_family</span><span class="text-xs font-bold uppercase text-[#5d5f5f]">TikTok Impacto</span></div>
                             <div class="mt-8"><div class="text-3xl font-bold">${escapeHtml(config.tiktok_views)}</div><div class="text-[#5d5f5f] text-sm">${escapeHtml(config.tiktok_desc)}</div></div>
                             <div class="w-full h-1 bg-[#efeded] mt-4 rounded-full overflow-hidden"><div class="h-full bg-[#b80049]" style="--final-width: ${config.tiktok_percent}%; width:0%" data-width="${config.tiktok_percent}"></div></div>
                         </div>
-                        <div class="bg-white p-6 rounded-xl ambient-shadow border border-[#e4bdc2]/30">
-                            <div class="flex justify-between"><span class="material-symbols-outlined text-[#b80049] text-3xl">movie_edit</span><span class="text-xs font-bold tracking-wider uppercase text-[#5d5f5f]">Alcance Reels</span></div>
+                        <div class="bg-white p-6 rounded-xl ambient-shadow border">
+                            <div class="flex justify-between"><span class="material-symbols-outlined text-[#b80049] text-3xl">movie_edit</span><span class="text-xs font-bold uppercase">Alcance Reels</span></div>
                             <div class="mt-8"><div class="text-3xl font-bold">${escapeHtml(config.reels_reach)}</div><div class="text-[#5d5f5f] text-sm">${escapeHtml(config.reels_desc)}</div></div>
                             <div class="w-full h-1 bg-[#efeded] mt-4 rounded-full overflow-hidden"><div class="h-full bg-[#b80049]" style="--final-width: ${config.reels_percent}%; width:0%" data-width="${config.reels_percent}"></div></div>
                         </div>
-                        <div class="bg-white p-6 rounded-xl ambient-shadow border border-[#e4bdc2]/30">
-                            <div class="flex justify-between"><span class="material-symbols-outlined text-[#b80049] text-3xl">groups</span><span class="text-xs font-bold tracking-wider uppercase text-[#5d5f5f]">Comunidade</span></div>
+                        <div class="bg-white p-6 rounded-xl ambient-shadow border">
+                            <div class="flex justify-between"><span class="material-symbols-outlined text-[#b80049] text-3xl">groups</span><span class="text-xs font-bold uppercase">Comunidade</span></div>
                             <div class="mt-8"><div class="text-3xl font-bold">${escapeHtml(config.comunidade_num)}</div><div class="text-[#5d5f5f] text-sm">${escapeHtml(config.comunidade_desc)}</div></div>
-                            <div class="flex mt-4 -space-x-2">
-                                <div class="w-8 h-8 rounded-full border-2 border-white bg-gray-300"></div>
-                                <div class="w-8 h-8 rounded-full border-2 border-white bg-[#e4bdc2]"></div>
-                                <div class="w-8 h-8 rounded-full border-2 border-white bg-[#b80049]/50"></div>
-                                <div class="w-8 h-8 rounded-full border-2 border-white flex items-center justify-center bg-[#b80049] text-white text-xs">+</div>
-                            </div>
                         </div>
                         <div class="bg-[#b80049] text-white p-6 rounded-xl shadow-lg shadow-[#b80049]/20">
                             <div class="flex justify-between mb-4"><span class="material-symbols-outlined text-3xl">podcasts</span><span class="px-2 py-1 bg-white/20 rounded text-[10px] font-bold uppercase">Destaque</span></div>
                             <div class="text-3xl font-bold">${escapeHtml(config.live_views)}</div>
                             <div class="text-white/90 text-sm">${escapeHtml(config.live_desc)}</div>
-                            <p class="mt-3 text-sm leading-snug">Autoridade em Retenção: prova de que atrai, ensina e fideliza.</p>
+                            <p class="mt-3 text-sm">${escapeHtml(config.live_texto_destaque)}</p>
                         </div>
-                    </section>
+                    </div>
 
-                    <!-- Audience Insights + Proposta Comercial -->
-                    <section class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
-                        <div class="bg-white p-8 rounded-xl ambient-shadow border border-[#e4bdc2]/30 relative overflow-hidden">
+                    <!-- Audience Insights + Proposta -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
+                        <div class="bg-white p-8 rounded-xl ambient-shadow border">
                             <h3 class="text-2xl text-[#b80049] mb-6 flex items-center gap-3"><span class="material-symbols-outlined">pie_chart</span> Perfil da Audiência</h3>
                             <div class="grid grid-cols-2 gap-8">
-                                <div><div class="text-xs font-bold tracking-wider text-[#5d5f5f] uppercase">Gênero dominante</div><div class="flex items-end gap-2 mt-1"><span class="text-3xl font-bold text-[#b80049]">${escapeHtml(config.genero_porcentagem)}</span><span class="material-symbols-outlined text-[#b80049]">female</span></div><div class="text-sm text-[#5b3f43]">${escapeHtml(config.genero_texto)}</div></div>
-                                <div><div class="text-xs font-bold tracking-wider text-[#5d5f5f] uppercase">Faixa etária</div><div class="flex items-end gap-2 mt-1"><span class="text-3xl font-bold text-[#b80049]">${escapeHtml(config.idade_range)}</span></div><div class="text-sm text-[#5b3f43]">${escapeHtml(config.idade_texto)}</div></div>
+                                <div><div class="text-xs font-bold uppercase text-[#5d5f5f]">Gênero</div><div class="flex items-end gap-2 mt-1"><span class="text-3xl font-bold text-[#b80049]">${escapeHtml(config.genero_porcentagem)}</span><span class="material-symbols-outlined text-[#b80049]">female</span></div><div class="text-sm">${escapeHtml(config.genero_texto)}</div></div>
+                                <div><div class="text-xs font-bold uppercase text-[#5d5f5f]">Idade</div><div class="flex items-end gap-2 mt-1"><span class="text-3xl font-bold text-[#b80049]">${escapeHtml(config.idade_range)}</span></div><div class="text-sm">${escapeHtml(config.idade_texto)}</div></div>
                             </div>
                             <div class="mt-10 p-6 bg-[#f5f3f3] rounded-lg border-l-4 border-[#b80049] italic"><p class="text-lg">“${escapeHtml(config.citacao)}”</p></div>
                         </div>
@@ -163,61 +145,53 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
                             <div class="w-16 h-16 rounded-full bg-[#b80049]/10 flex items-center justify-center"><span class="material-symbols-outlined text-[#b80049] text-3xl">shopping_cart_checkout</span></div>
                             <h3 class="text-3xl font-bold leading-tight">${escapeHtml(config.texto_proposta)}</h3>
                             <p class="text-[#5d5f5f] max-w-md">${escapeHtml(config.subtitulo_proposta)}</p>
-                            <button class="stitching-border border-[#b80049] text-[#b80049] px-8 py-3 rounded-full font-bold hover:bg-[#b80049]/5 flex items-center gap-2 group">Solicitar Proposta Comercial <span class="material-symbols-outlined group-hover:translate-x-1 transition">arrow_forward</span></button>
+                            <button class="stitching-border border-[#b80049] text-[#b80049] px-8 py-3 rounded-full font-bold hover:bg-[#b80049]/5">Solicitar proposta</button>
                         </div>
-                    </section>
+                    </div>
 
-                    <!-- Portfólio criativo (grid) -->
-                    <section class="mb-12">
+                    <!-- Portfólio -->
+                    <div class="mb-12">
                         <h3 class="text-2xl text-[#b80049] mb-5">Portfólio Criativo</h3>
                         <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4" id="portfolio-grid"></div>
-                    </section>
+                    </div>
                 `;
 
-                // Preencher grid do portfólio
                 const grid = document.getElementById('portfolio-grid');
-                grid.innerHTML = '';
                 portfolio.forEach(item => {
-                    const card = document.createElement('div');
-                    card.className = 'aspect-square bg-[#efeded] rounded-lg overflow-hidden relative group';
-                    card.innerHTML = `
-                        <img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="${escapeHtml(item.imagem_url)}" alt="${escapeHtml(item.legenda)}">
-                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-3">
-                            <span class="text-white text-[10px] font-bold uppercase tracking-widest text-center">${escapeHtml(item.legenda)}</span>
+                    const div = document.createElement('div');
+                    div.className = 'aspect-square bg-[#efeded] rounded-lg overflow-hidden relative group';
+                    div.innerHTML = `
+                        <img class="w-full h-full object-cover group-hover:scale-110 transition duration-500" src="${escapeHtml(item.imagem_url)}" alt="${escapeHtml(item.legenda)}">
+                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center p-3">
+                            <span class="text-white text-[10px] font-bold uppercase">${escapeHtml(item.legenda)}</span>
                         </div>
                     `;
-                    grid.appendChild(card);
+                    grid.appendChild(div);
                 });
 
-                // Animar barras de progresso
                 document.querySelectorAll('.bg-[#b80049][data-width]').forEach(bar => {
-                    const w = bar.getAttribute('data-width');
-                    bar.style.setProperty('--final-width', w + '%');
+                    bar.style.setProperty('--final-width', bar.getAttribute('data-width') + '%');
                     bar.classList.add('animate-grow');
                 });
 
-                // Rodapé
+                // Rodapé e redes sociais
                 document.getElementById('footer-nome').innerText = config.nome_profissional;
                 document.getElementById('footer-bio').innerText = config.sub_nome;
                 document.getElementById('footer-email').innerText = config.email_contato;
                 document.getElementById('footer-phone').innerText = config.telefone_contato;
 
-            } catch (erro) {
-                console.error(erro);
-                document.getElementById('conteudo-principal').innerHTML = `<div class="text-center py-20 text-red-500">Erro ao carregar dados. Verifique:<br> - Credenciais do Supabase<br> - Se as tabelas existem<br> - Se o RLS está desabilitado (ALTER TABLE ... DISABLE ROW LEVEL SECURITY;)</div>`;
+                const socialDiv = document.getElementById('social-icons');
+                socialDiv.innerHTML = `
+                    <a href="${escapeHtml(config.youtube_url)}" target="_blank" class="w-10 h-10 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition"><span class="material-symbols-outlined">smart_display</span></a>
+                    <a href="${escapeHtml(config.instagram_url)}" target="_blank" class="w-10 h-10 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition"><span class="material-symbols-outlined">photo_camera</span></a>
+                    <a href="${escapeHtml(config.tiktok_url)}" target="_blank" class="w-10 h-10 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition"><span class="material-symbols-outlined">music_note</span></a>
+                `;
+            } catch (err) {
+                document.getElementById('conteudo-principal').innerHTML = `<div class="text-red-500">Erro: ${err.message}</div>`;
             }
         }
 
-        function escapeHtml(texto) {
-            if (!texto) return '';
-            return texto.replace(/[&<>]/g, function(m) {
-                if (m === '&') return '&amp;';
-                if (m === '<') return '&lt;';
-                if (m === '>') return '&gt;';
-                return m;
-            });
-        }
-
+        function escapeHtml(str) { return (str || '').replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
         carregarDados();
     </script>
 </body>
