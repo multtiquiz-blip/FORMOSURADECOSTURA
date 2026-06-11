@@ -1,11 +1,12 @@
 {
   "name": "formosa-de-costura",
   "version": "1.0.0",
-  "description": "Midia Kit e Painel de Controle - Rose Gercóssimo",
+  "description": "Midia Kit e Painel da Rose Gercóssimo",
+  "main": "src/index.html",
   "scripts": {
-    "build": "echo 'Preparando o ambiente...'",
-    "deploy": "vercel --prod"
+    "test": "echo \"Erro: nenhum teste especificado\" && exit 1"
   },
-  "dependencies": {},
-  "devDependencies": {}
+  "keywords": ["costura", "midiakit", "dashboard"],
+  "author": "Papai",
+  "license": "ISC"
 }
