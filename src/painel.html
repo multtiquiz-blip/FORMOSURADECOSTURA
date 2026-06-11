@@ -224,16 +224,38 @@
                 <input type="text" data-id="${item.id}" data-campo="legenda" class="portfolio-input w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent text-sm" value="${escapeHtml(item.legenda)}">
                 <div class="flex justify-between mt-3">
                     <span class="text-xs text-[#5d5f5f]">Ordem: ${item.ordem}</span>
-                    <button onclick="removerProjeto(${item.id})" class="text-red-500 text-xs hover:underline">Remover</button>
+                    <button onclick="removerProjeto(this, ${item.id})" class="text-red-500 text-xs hover:underline">Remover</button>
                 </div>
             `;
             container.appendChild(card);
         });
     }
 
+    // Função corrigida para remover projeto tanto do DOM quanto do banco imediatamente
+    window.removerProjeto = async function(botao, id) {
+        if (!confirm('Tem certeza que deseja remover este projeto? A ação é irreversível.')) return;
+        
+        // Remove visualmente do DOM
+        const card = botao.closest('.border');
+        if (card) card.remove();
+        
+        // Remove do banco de dados
+        try {
+            await fetch(`${SUPABASE_URL}/rest/v1/portfolio?id=eq.${id}`, {
+                method: 'DELETE',
+                headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
+            });
+            // Atualiza os dados originais (opcional)
+            await carregarDados(); // Recarrega todo o painel para sincronizar
+        } catch (err) {
+            console.error('Erro ao remover projeto:', err);
+            alert('Erro ao remover projeto. Recarregue a página e tente novamente.');
+        }
+    };
+
     window.adicionarProjeto = function() {
-        const novoId = Date.now();
         const container = document.getElementById('portfolio-editor');
+        const novoId = Date.now(); // ID temporário
         const card = document.createElement('div');
         card.className = 'border border-dashed border-[#e4bdc2] rounded-lg p-3 bg-[#fef8f6]';
         card.innerHTML = `
@@ -244,27 +266,17 @@
             <input type="text" data-id="${novoId}" data-campo="legenda" class="portfolio-input w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent text-sm" value="Novo projeto">
             <div class="flex justify-between mt-3">
                 <span class="text-xs text-[#5d5f5f]">Novo</span>
-                <button onclick="removerProjeto(${novoId})" class="text-red-500 text-xs hover:underline">Remover</button>
+                <button onclick="removerProjeto(this, ${novoId})" class="text-red-500 text-xs hover:underline">Remover</button>
             </div>
         `;
         container.appendChild(card);
     };
 
-    window.removerProjeto = function(id) {
-        const cards = document.querySelectorAll('#portfolio-editor .border');
-        for (let card of cards) {
-            if (card.innerHTML.includes(`data-id="${id}"`)) {
-                card.remove();
-                break;
-            }
-        }
-    };
-
     async function salvarTudo() {
         const statusDiv = document.getElementById('status-msg');
         statusDiv.innerHTML = '<span class="material-symbols-outlined text-[#b80049] text-base animate-spin">refresh</span> Salvando...';
-        statusDiv.style.opacity = '1';
 
+        // Coletar configurações
         const updates = {};
         const idsConfig = [
             'nome_profissional', 'sub_nome', 'bio_curta', 'email_contato', 'telefone_contato', 'foto_perfil_url',
@@ -282,6 +294,7 @@
             if (el) updates[id] = el.value;
         }
 
+        // Salvar configurações (PATCH)
         for (let [chave, valor] of Object.entries(updates)) {
             await fetch(`${SUPABASE_URL}/rest/v1/site_config?config_key=eq.${chave}`, {
                 method: 'PATCH',
@@ -290,6 +303,7 @@
             });
         }
 
+        // Coletar portfólio atual
         const portfolioItens = [];
         const cards = document.querySelectorAll('#portfolio-editor .border');
         let ordem = 0;
@@ -298,7 +312,7 @@
             const inputsLegenda = card.querySelector('input[data-campo="legenda"]');
             if (inputsImagem && inputsLegenda) {
                 let id = parseInt(inputsImagem.getAttribute('data-id'));
-                if (isNaN(id)) id = null;
+                if (isNaN(id) || id < 0) id = null;
                 portfolioItens.push({
                     id: id,
                     imagem_url: inputsImagem.value,
@@ -308,7 +322,8 @@
             }
         }
 
-        await fetch(`${SUPABASE_URL}/rest/v1/portfolio?order=ordem`, {
+        // Substituir todo o portfólio (DELETE + INSERT)
+        await fetch(`${SUPABASE_URL}/rest/v1/portfolio`, {
             method: 'DELETE',
             headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
         });
@@ -324,7 +339,7 @@
         setTimeout(() => {
             statusDiv.innerHTML = '<span class="material-symbols-outlined text-[#b80049] text-base">info</span> Pronto para salvar';
         }, 3000);
-        await carregarDados();
+        await carregarDados(); // Recarrega para mostrar os dados atualizados
     }
 
     window.descartarAlteracoes = function() {
