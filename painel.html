@@ -7,9 +7,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+    <!-- Supabase client oficial -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { font-family: 'Inter', sans-serif; background: #fbf9f8; }
-        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
         .soft-shadow { box-shadow: 0 4px 20px rgba(184, 0, 73, 0.05); }
         .stitching-border { border: 2px dashed #e4bdc2; }
     </style>
@@ -27,8 +28,13 @@
             </a>
         </header>
 
+        <!-- Área de debug para mostrar erros -->
+        <div id="debug" class="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg hidden">
+            <strong class="text-yellow-800">🔍 Debug:</strong>
+            <pre id="debug-mensagem" class="text-sm mt-2 text-yellow-700 whitespace-pre-wrap"></pre>
+        </div>
+
         <div id="formulario-painel" class="space-y-8">
-            <!-- Carregando... -->
             <div class="text-center py-10 text-[#5d5f5f]">Carregando dados do banco...</div>
         </div>
 
@@ -49,32 +55,63 @@
     </div>
 
     <script>
-        // ========== CONFIGURAÇÕES SUPABASE ==========
-        const SUPABASE_URL = 'https://seuprojeto.supabase.co';
-        const SUPABASE_ANON_KEY = 'sua-chave-anon-aqui';
-        // ===========================================
+        // CONFIGURAÇÕES REAIS DO SUPABASE
+        const SUPABASE_URL = 'https://nhnhqjyrawaftlomlilg.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5obmhxanlyYXdhZnRsb21saWxnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyMDY3ODgsImV4cCI6MjA5Njc4Mjc4OH0.GtOdh4sLzxrwPxOvnKJO5bf4x4hebpuC9RlR-06V0RE';
 
-        let dadosOriginais = null;   // para comparar e descartar
+        // Inicializa o cliente Supabase
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        async function carregarDadosParaEdicao() {
+        let dadosOriginais = null;
+
+        function mostrarErro(mensagem) {
+            const debugDiv = document.getElementById('debug');
+            const debugMsg = document.getElementById('debug-mensagem');
+            debugMsg.innerText = mensagem;
+            debugDiv.classList.remove('hidden');
+        }
+
+        function esconderErro() {
+            document.getElementById('debug').classList.add('hidden');
+        }
+
+        async function carregarDados() {
             try {
-                const configResp = await fetch(`${SUPABASE_URL}/rest/v1/site_config?select=config_key,config_value`, {
-                    headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
-                });
-                const configArray = await configResp.json();
+                esconderErro();
+                document.getElementById('formulario-painel').innerHTML = '<div class="text-center py-10 text-[#5d5f5f]">Carregando dados do banco...</div>';
+
+                // Buscar configurações
+                const { data: configData, error: configError } = await supabase
+                    .from('site_config')
+                    .select('config_key, config_value');
+
+                if (configError) {
+                    throw new Error(`Erro nas configurações: ${configError.message} (código: ${configError.code})`);
+                }
+
+                if (!configData || configData.length === 0) {
+                    throw new Error('Nenhum registro encontrado na tabela site_config. Execute o script SQL de inserção.');
+                }
+
                 const config = {};
-                configArray.forEach(item => { config[item.config_key] = item.config_value; });
+                configData.forEach(item => { config[item.config_key] = item.config_value; });
 
-                const portResp = await fetch(`${SUPABASE_URL}/rest/v1/portfolio?select=*&order=ordem`, {
-                    headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
-                });
-                const portfolio = await portResp.json();
+                // Buscar portfólio
+                const { data: portfolio, error: portError } = await supabase
+                    .from('portfolio')
+                    .select('*')
+                    .order('ordem', { ascending: true });
 
-                dadosOriginais = { config, portfolio };
-                renderizarFormulario(config, portfolio);
+                if (portError) {
+                    throw new Error(`Erro no portfólio: ${portError.message}`);
+                }
+
+                dadosOriginais = { config, portfolio: portfolio || [] };
+                renderizarFormulario(config, portfolio || []);
             } catch (err) {
-                document.getElementById('formulario-painel').innerHTML = '<div class="text-red-500 text-center py-10">Erro ao carregar dados. Verifique suas credenciais.</div>';
                 console.error(err);
+                mostrarErro(err.message);
+                document.getElementById('formulario-painel').innerHTML = `<div class="text-center py-10 text-red-500">❌ Falha ao carregar dados: ${err.message}</div>`;
             }
         }
 
@@ -84,11 +121,11 @@
                 <section class="bg-white p-6 rounded-xl soft-shadow border border-[#e4bdc2]/30">
                     <h2 class="text-2xl text-[#b80049] mb-5 flex items-center gap-2"><span class="material-symbols-outlined">edit_note</span> Dados principais</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Nome profissional</label><input type="text" id="nome_profissional" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.nome_profissional)}"></div>
-                        <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Subnome (título)</label><input type="text" id="sub_nome" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.sub_nome)}"></div>
-                        <div class="md:col-span-2"><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Bio curta (frase de destaque)</label><input type="text" id="bio_curta" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.bio_curta)}"></div>
-                        <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">E-mail de contato</label><input type="email" id="email_contato" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.email_contato)}"></div>
-                        <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Telefone</label><input type="text" id="telefone_contato" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.telefone_contato)}"></div>
+                        <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Nome profissional</label><input type="text" id="nome_profissional" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.nome_profissional || '')}"></div>
+                        <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Subnome (título)</label><input type="text" id="sub_nome" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.sub_nome || '')}"></div>
+                        <div class="md:col-span-2"><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Bio curta (frase de destaque)</label><input type="text" id="bio_curta" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.bio_curta || '')}"></div>
+                        <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">E-mail de contato</label><input type="email" id="email_contato" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.email_contato || '')}"></div>
+                        <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Telefone</label><input type="text" id="telefone_contato" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.telefone_contato || '')}"></div>
                     </div>
                 </section>
 
@@ -96,12 +133,12 @@
                 <section class="bg-white p-6 rounded-xl soft-shadow border border-[#e4bdc2]/30">
                     <h2 class="text-2xl text-[#b80049] mb-5 flex items-center gap-2"><span class="material-symbols-outlined">analytics</span> Métricas sociais</h2>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">TikTok views</label><input type="text" id="tiktok_views" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.tiktok_views)}"><label class="block text-xs mt-2">Descrição</label><input type="text" id="tiktok_desc" value="${escapeHtml(config.tiktok_desc)}" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2"><label class="block text-xs mt-2">Porcentagem da barra (0-100)</label><input type="number" id="tiktok_percent" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${config.tiktok_percent}"></div>
-                        <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Reels reach</label><input type="text" id="reels_reach" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.reels_reach)}"><label class="block text-xs mt-2">Descrição</label><input type="text" id="reels_desc" value="${escapeHtml(config.reels_desc)}" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2"><label class="block text-xs mt-2">Porcentagem da barra</label><input type="number" id="reels_percent" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${config.reels_percent}"></div>
-                        <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Comunidade</label><input type="text" id="comunidade_num" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.comunidade_num)}"><label class="block text-xs mt-2">Descrição</label><input type="text" id="comunidade_desc" value="${escapeHtml(config.comunidade_desc)}" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2"></div>
+                        <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">TikTok views</label><input type="text" id="tiktok_views" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.tiktok_views || '')}"><label class="block text-xs mt-2">Descrição</label><input type="text" id="tiktok_desc" value="${escapeHtml(config.tiktok_desc || '')}" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2"><label class="block text-xs mt-2">Porcentagem da barra (0-100)</label><input type="number" id="tiktok_percent" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${config.tiktok_percent || 0}"></div>
+                        <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Reels reach</label><input type="text" id="reels_reach" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.reels_reach || '')}"><label class="block text-xs mt-2">Descrição</label><input type="text" id="reels_desc" value="${escapeHtml(config.reels_desc || '')}" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2"><label class="block text-xs mt-2">Porcentagem da barra</label><input type="number" id="reels_percent" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${config.reels_percent || 0}"></div>
+                        <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Comunidade</label><input type="text" id="comunidade_num" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.comunidade_num || '')}"><label class="block text-xs mt-2">Descrição</label><input type="text" id="comunidade_desc" value="${escapeHtml(config.comunidade_desc || '')}" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2"></div>
                     </div>
                     <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Live views (destaque)</label><input type="text" id="live_views" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.live_views)}"><label class="block text-xs mt-2">Descrição</label><input type="text" id="live_desc" value="${escapeHtml(config.live_desc)}" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2"></div>
+                        <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Live views (destaque)</label><input type="text" id="live_views" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.live_views || '')}"><label class="block text-xs mt-2">Descrição</label><input type="text" id="live_desc" value="${escapeHtml(config.live_desc || '')}" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2"></div>
                     </div>
                 </section>
 
@@ -109,17 +146,17 @@
                 <section class="bg-white p-6 rounded-xl soft-shadow border border-[#e4bdc2]/30">
                     <h2 class="text-2xl text-[#b80049] mb-5 flex items-center gap-2"><span class="material-symbols-outlined">pie_chart</span> Perfil da audiência</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Porcentagem gênero</label><input type="text" id="genero_porcentagem" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.genero_porcentagem)}"><label class="block text-xs mt-2">Texto</label><input type="text" id="genero_texto" value="${escapeHtml(config.genero_texto)}" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2"></div>
-                        <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Faixa etária</label><input type="text" id="idade_range" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.idade_range)}"><label class="block text-xs mt-2">Texto descritivo</label><input type="text" id="idade_texto" value="${escapeHtml(config.idade_texto)}" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2"></div>
-                        <div class="md:col-span-2"><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Citação em destaque</label><textarea id="citacao" rows="2" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2">${escapeHtml(config.citacao)}</textarea></div>
+                        <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Porcentagem gênero</label><input type="text" id="genero_porcentagem" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.genero_porcentagem || '')}"><label class="block text-xs mt-2">Texto</label><input type="text" id="genero_texto" value="${escapeHtml(config.genero_texto || '')}" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2"></div>
+                        <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Faixa etária</label><input type="text" id="idade_range" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.idade_range || '')}"><label class="block text-xs mt-2">Texto descritivo</label><input type="text" id="idade_texto" value="${escapeHtml(config.idade_texto || '')}" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2"></div>
+                        <div class="md:col-span-2"><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Citação em destaque</label><textarea id="citacao" rows="2" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2">${escapeHtml(config.citacao || '')}</textarea></div>
                     </div>
                 </section>
 
                 <!-- Proposta comercial -->
                 <section class="bg-white p-6 rounded-xl soft-shadow border border-[#e4bdc2]/30">
                     <h2 class="text-2xl text-[#b80049] mb-5 flex items-center gap-2"><span class="material-symbols-outlined">shopping_cart_checkout</span> Proposta comercial</h2>
-                    <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Título principal</label><input type="text" id="texto_proposta" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.texto_proposta)}"></div>
-                    <div class="mt-4"><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Subtítulo / descrição</label><textarea id="subtitulo_proposta" rows="2" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2">${escapeHtml(config.subtitulo_proposta)}</textarea></div>
+                    <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Título principal</label><input type="text" id="texto_proposta" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.texto_proposta || '')}"></div>
+                    <div class="mt-4"><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Subtítulo / descrição</label><textarea id="subtitulo_proposta" rows="2" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2">${escapeHtml(config.subtitulo_proposta || '')}</textarea></div>
                 </section>
 
                 <!-- Gerenciador de portfólio -->
@@ -133,7 +170,6 @@
             `;
 
             document.getElementById('formulario-painel').innerHTML = html;
-            // Preencher o editor de portfólio
             renderizarPortfolioEditor(portfolio);
         }
 
@@ -161,7 +197,6 @@
             });
         }
 
-        // Funções auxiliares do portfólio
         window.adicionarProjeto = function() {
             const novoId = Date.now();
             const container = document.getElementById('portfolio-editor');
@@ -186,7 +221,6 @@
             if (inputs.length) {
                 inputs[0].closest('.border').remove();
             } else {
-                // se for um recém adicionado
                 const cards = document.querySelectorAll('#portfolio-editor .border');
                 for (let card of cards) {
                     if (card.innerHTML.includes(`data-id="${id}"`)) {
@@ -217,13 +251,9 @@
                 if (el) updates[id] = el.value;
             }
 
-            // Enviar configurações para o Supabase (um PATCH por linha)
+            // Salvar configurações uma a uma
             for (let [chave, valor] of Object.entries(updates)) {
-                await fetch(`${SUPABASE_URL}/rest/v1/site_config?config_key=eq.${chave}`, {
-                    method: 'PATCH',
-                    headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ config_value: valor })
-                });
+                await supabase.from('site_config').upsert({ config_key: chave, config_value: valor }, { onConflict: 'config_key' });
             }
 
             // Coletar portfólio atual
@@ -245,36 +275,28 @@
                 }
             }
 
-            // Substituir todos os itens do portfólio (DELETE + INSERT)
-            await fetch(`${SUPABASE_URL}/rest/v1/portfolio?order=ordem`, {
-                method: 'DELETE',
-                headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
-            });
+            // Remover todos os itens atuais e reinserir
+            await supabase.from('portfolio').delete().neq('id', 0); // gambiarra para deletar tudo
             for (let item of portfolioItens) {
-                await fetch(`${SUPABASE_URL}/rest/v1/portfolio`, {
-                    method: 'POST',
-                    headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ imagem_url: item.imagem_url, legenda: item.legenda, ordem: item.ordem })
-                });
+                await supabase.from('portfolio').insert({ imagem_url: item.imagem_url, legenda: item.legenda, ordem: item.ordem });
             }
 
             statusDiv.innerHTML = '<span class="material-symbols-outlined text-green-600 text-base">check_circle</span> Salvo com sucesso!';
             setTimeout(() => {
                 statusDiv.innerHTML = '<span class="material-symbols-outlined text-[#b80049] text-base">info</span> Pronto para salvar';
             }, 3000);
-            // Recarregar dados para manter consistência
-            await carregarDadosParaEdicao();
+            await carregarDados();
         }
 
         window.descartarAlteracoes = function() {
             if (confirm('Tem certeza? Todas as alterações não salvas serão perdidas.')) {
-                carregarDadosParaEdicao();
+                carregarDados();
             }
         };
 
         function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
 
-        carregarDadosParaEdicao();
+        carregarDados();
     </script>
 </body>
 </html>
