@@ -70,7 +70,8 @@
     // ========== CONFIGURAÇÕES ==========
     const SUPABASE_URL = 'https://nhnhqjyrawaftlomlilg.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5obmhxanlyYXdhZnRsb21saWxnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyMDY3ODgsImV4cCI6MjA5Njc4Mjc4OH0.GtOdh4sLzxrwPxOvnKJO5bf4x4hebpuC9RlR-06V0RE';
-    const SENHA_CORRETA = 'Rose2025';  // ALTERE A SENHA AQUI
+    const SENHA_CORRETA = 'Rose2025';
+    let salvando = false; // Evita salvamentos paralelos
     // ===================================
 
     let dadosOriginais = null;
@@ -112,13 +113,14 @@
             dadosOriginais = { config, portfolio };
             renderizarFormulario(config, portfolio);
         } catch (err) {
-            container.innerHTML = `<div class="bg-red-100 p-6 rounded-xl text-red-700">Erro: ${err.message}</div>`;
+            container.innerHTML = `<div class="bg-red-100 p-6 rounded-xl text-red-700">Erro ao carregar dados: ${err.message}</div>`;
         }
     }
 
+    // Função principal que cria o formulário
     function renderizarFormulario(config, portfolio) {
         const html = `
-            <!-- Dados principais -->
+            <!-- Seções do formulário... (mantido igual ao seu código original) -->
             <section class="bg-white p-6 rounded-xl soft-shadow border border-[#e4bdc2]/30">
                 <h2 class="text-2xl text-[#b80049] mb-5 flex items-center gap-2"><span class="material-symbols-outlined">edit_note</span> Dados principais</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -138,7 +140,7 @@
                     <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">YouTube (URL do canal)</label><input type="text" id="youtube_url" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.youtube_url)}"></div>
                     <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Instagram (URL)</label><input type="text" id="instagram_url" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.instagram_url)}"></div>
                     <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">TikTok (URL)</label><input type="text" id="tiktok_url" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.tiktok_url)}"></div>
-                    <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">ID do vídeo do YouTube (ex: dQw4w9WgXcQ)</label><input type="text" id="youtube_video_id" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.youtube_video_id)}"></div>
+                    <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">ID do vídeo do YouTube</label><input type="text" id="youtube_video_id" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.youtube_video_id)}"></div>
                 </div>
             </section>
 
@@ -158,7 +160,7 @@
                     <div>
                         <label class="block text-xs font-bold uppercase text-[#5d5f5f]">TikTok views</label><input type="text" id="tiktok_views" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.tiktok_views)}">
                         <label class="block text-xs mt-2">Descrição</label><input type="text" id="tiktok_desc" value="${escapeHtml(config.tiktok_desc)}" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2">
-                        <label class="block text-xs mt-2">Porcentagem da barra (0-100)</label><input type="number" id="tiktok_percent" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${config.tiktok_percent}">
+                        <label class="block text-xs mt-2">Porcentagem da barra</label><input type="number" id="tiktok_percent" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${config.tiktok_percent}">
                     </div>
                     <div>
                         <label class="block text-xs font-bold uppercase text-[#5d5f5f]">Reels reach</label><input type="text" id="reels_reach" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.reels_reach)}">
@@ -166,13 +168,13 @@
                         <label class="block text-xs mt-2">Porcentagem</label><input type="number" id="reels_percent" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${config.reels_percent}">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold uppercase text-[#5d5f5f]">Comunidade (número)</label><input type="text" id="comunidade_num" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.comunidade_num)}">
+                        <label class="block text-xs font-bold uppercase text-[#5d5f5f]">Comunidade</label><input type="text" id="comunidade_num" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.comunidade_num)}">
                         <label class="block text-xs mt-2">Descrição</label><input type="text" id="comunidade_desc" value="${escapeHtml(config.comunidade_desc)}" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2">
                     </div>
                 </div>
                 <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Live views (destaque)</label><input type="text" id="live_views" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.live_views)}"><label class="block text-xs mt-2">Descrição</label><input type="text" id="live_desc" value="${escapeHtml(config.live_desc)}" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2"></div>
-                    <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Texto do card de destaque</label><textarea id="live_texto_destaque" rows="2" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2">${escapeHtml(config.live_texto_destaque)}</textarea></div>
+                    <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Live views</label><input type="text" id="live_views" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.live_views)}"><label class="block text-xs mt-2">Descrição</label><input type="text" id="live_desc" value="${escapeHtml(config.live_desc)}" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2"></div>
+                    <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Texto do destaque</label><textarea id="live_texto_destaque" rows="2" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2">${escapeHtml(config.live_texto_destaque)}</textarea></div>
                 </div>
             </section>
 
@@ -181,19 +183,19 @@
                 <h2 class="text-2xl text-[#b80049] mb-5 flex items-center gap-2"><span class="material-symbols-outlined">pie_chart</span> Perfil da audiência</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Porcentagem gênero</label><input type="text" id="genero_porcentagem" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.genero_porcentagem)}"><label class="block text-xs mt-2">Texto</label><input type="text" id="genero_texto" value="${escapeHtml(config.genero_texto)}" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2"></div>
-                    <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Faixa etária</label><input type="text" id="idade_range" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.idade_range)}"><label class="block text-xs mt-2">Texto descritivo</label><input type="text" id="idade_texto" value="${escapeHtml(config.idade_texto)}" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2"></div>
-                    <div class="md:col-span-2"><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Citação em destaque</label><textarea id="citacao" rows="2" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2">${escapeHtml(config.citacao)}</textarea></div>
+                    <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Faixa etária</label><input type="text" id="idade_range" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.idade_range)}"><label class="block text-xs mt-2">Texto</label><input type="text" id="idade_texto" value="${escapeHtml(config.idade_texto)}" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2"></div>
+                    <div class="md:col-span-2"><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Citação</label><textarea id="citacao" rows="2" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2">${escapeHtml(config.citacao)}</textarea></div>
                 </div>
             </section>
 
             <!-- Proposta comercial -->
             <section class="bg-white p-6 rounded-xl soft-shadow border border-[#e4bdc2]/30">
                 <h2 class="text-2xl text-[#b80049] mb-5 flex items-center gap-2"><span class="material-symbols-outlined">shopping_cart_checkout</span> Proposta comercial</h2>
-                <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Título principal</label><input type="text" id="texto_proposta" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.texto_proposta)}"></div>
-                <div class="mt-4"><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Subtítulo / descrição</label><textarea id="subtitulo_proposta" rows="2" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2">${escapeHtml(config.subtitulo_proposta)}</textarea></div>
+                <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Título</label><input type="text" id="texto_proposta" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.texto_proposta)}"></div>
+                <div class="mt-4"><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Subtítulo</label><textarea id="subtitulo_proposta" rows="2" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2">${escapeHtml(config.subtitulo_proposta)}</textarea></div>
             </section>
 
-            <!-- Gerenciador de portfólio -->
+            <!-- Portfólio -->
             <section class="bg-white p-6 rounded-xl soft-shadow border border-[#e4bdc2]/30">
                 <div class="flex justify-between items-center mb-5">
                     <h2 class="text-2xl text-[#b80049] flex items-center gap-2"><span class="material-symbols-outlined">collections_bookmark</span> Portfólio</h2>
@@ -207,11 +209,12 @@
         renderizarPortfolioEditor(portfolio);
     }
 
+    // Função que monta a lista visual do portfólio
     function renderizarPortfolioEditor(portfolio) {
         const container = document.getElementById('portfolio-editor');
         if (!container) return;
         container.innerHTML = '';
-        portfolio.forEach((item) => {
+        (portfolio || []).forEach((item) => {
             const card = document.createElement('div');
             card.className = 'border border-dashed border-[#e4bdc2] rounded-lg p-3 bg-[#fef8f6]';
             card.innerHTML = `
@@ -224,38 +227,16 @@
                 <input type="text" data-id="${item.id}" data-campo="legenda" class="portfolio-input w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent text-sm" value="${escapeHtml(item.legenda)}">
                 <div class="flex justify-between mt-3">
                     <span class="text-xs text-[#5d5f5f]">Ordem: ${item.ordem}</span>
-                    <button onclick="removerProjeto(this, ${item.id})" class="text-red-500 text-xs hover:underline">Remover</button>
+                    <button onclick="removerProjeto(${item.id})" class="text-red-500 text-xs hover:underline">Remover</button>
                 </div>
             `;
             container.appendChild(card);
         });
     }
 
-    // Função corrigida para remover projeto tanto do DOM quanto do banco imediatamente
-    window.removerProjeto = async function(botao, id) {
-        if (!confirm('Tem certeza que deseja remover este projeto? A ação é irreversível.')) return;
-        
-        // Remove visualmente do DOM
-        const card = botao.closest('.border');
-        if (card) card.remove();
-        
-        // Remove do banco de dados
-        try {
-            await fetch(`${SUPABASE_URL}/rest/v1/portfolio?id=eq.${id}`, {
-                method: 'DELETE',
-                headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
-            });
-            // Atualiza os dados originais (opcional)
-            await carregarDados(); // Recarrega todo o painel para sincronizar
-        } catch (err) {
-            console.error('Erro ao remover projeto:', err);
-            alert('Erro ao remover projeto. Recarregue a página e tente novamente.');
-        }
-    };
-
     window.adicionarProjeto = function() {
+        const novoId = Date.now();
         const container = document.getElementById('portfolio-editor');
-        const novoId = Date.now(); // ID temporário
         const card = document.createElement('div');
         card.className = 'border border-dashed border-[#e4bdc2] rounded-lg p-3 bg-[#fef8f6]';
         card.innerHTML = `
@@ -266,80 +247,113 @@
             <input type="text" data-id="${novoId}" data-campo="legenda" class="portfolio-input w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent text-sm" value="Novo projeto">
             <div class="flex justify-between mt-3">
                 <span class="text-xs text-[#5d5f5f]">Novo</span>
-                <button onclick="removerProjeto(this, ${novoId})" class="text-red-500 text-xs hover:underline">Remover</button>
+                <button onclick="removerProjeto(${novoId})" class="text-red-500 text-xs hover:underline">Remover</button>
             </div>
         `;
         container.appendChild(card);
     };
 
-    async function salvarTudo() {
-        const statusDiv = document.getElementById('status-msg');
-        statusDiv.innerHTML = '<span class="material-symbols-outlined text-[#b80049] text-base animate-spin">refresh</span> Salvando...';
-
-        // Coletar configurações
-        const updates = {};
-        const idsConfig = [
-            'nome_profissional', 'sub_nome', 'bio_curta', 'email_contato', 'telefone_contato', 'foto_perfil_url',
-            'youtube_url', 'instagram_url', 'tiktok_url', 'youtube_video_id',
-            'tag1', 'tag2',
-            'tiktok_views', 'tiktok_desc', 'tiktok_percent',
-            'reels_reach', 'reels_desc', 'reels_percent',
-            'comunidade_num', 'comunidade_desc',
-            'live_views', 'live_desc', 'live_texto_destaque',
-            'genero_porcentagem', 'genero_texto', 'idade_range', 'idade_texto',
-            'citacao', 'texto_proposta', 'subtitulo_proposta'
-        ];
-        for (let id of idsConfig) {
-            const el = document.getElementById(id);
-            if (el) updates[id] = el.value;
-        }
-
-        // Salvar configurações (PATCH)
-        for (let [chave, valor] of Object.entries(updates)) {
-            await fetch(`${SUPABASE_URL}/rest/v1/site_config?config_key=eq.${chave}`, {
-                method: 'PATCH',
-                headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ config_value: valor })
-            });
-        }
-
-        // Coletar portfólio atual
-        const portfolioItens = [];
+    window.removerProjeto = function(id) {
         const cards = document.querySelectorAll('#portfolio-editor .border');
-        let ordem = 0;
         for (let card of cards) {
-            const inputsImagem = card.querySelector('input[data-campo="imagem_url"]');
-            const inputsLegenda = card.querySelector('input[data-campo="legenda"]');
-            if (inputsImagem && inputsLegenda) {
-                let id = parseInt(inputsImagem.getAttribute('data-id'));
-                if (isNaN(id) || id < 0) id = null;
-                portfolioItens.push({
-                    id: id,
-                    imagem_url: inputsImagem.value,
-                    legenda: inputsLegenda.value,
-                    ordem: ordem++
-                });
+            if (card.innerHTML.includes(`data-id="${id}"`)) {
+                card.remove();
+                break;
             }
         }
+    };
 
-        // Substituir todo o portfólio (DELETE + INSERT)
-        await fetch(`${SUPABASE_URL}/rest/v1/portfolio`, {
-            method: 'DELETE',
-            headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
-        });
-        for (let item of portfolioItens) {
-            await fetch(`${SUPABASE_URL}/rest/v1/portfolio`, {
-                method: 'POST',
-                headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ imagem_url: item.imagem_url, legenda: item.legenda, ordem: item.ordem })
+    // Função de salvamento otimizada e corrigida
+    async function salvarTudo() {
+        if (salvando) return;
+        salvando = true;
+        const statusDiv = document.getElementById('status-msg');
+        const originalMsg = statusDiv.innerHTML;
+        statusDiv.innerHTML = '<span class="material-symbols-outlined text-[#b80049] text-base animate-spin">refresh</span> Salvando...';
+        statusDiv.style.opacity = '1';
+
+        try {
+            // Coletar dados das configurações
+            const updates = {};
+            const idsConfig = [
+                'nome_profissional', 'sub_nome', 'bio_curta', 'email_contato', 'telefone_contato', 'foto_perfil_url',
+                'youtube_url', 'instagram_url', 'tiktok_url', 'youtube_video_id',
+                'tag1', 'tag2',
+                'tiktok_views', 'tiktok_desc', 'tiktok_percent',
+                'reels_reach', 'reels_desc', 'reels_percent',
+                'comunidade_num', 'comunidade_desc',
+                'live_views', 'live_desc', 'live_texto_destaque',
+                'genero_porcentagem', 'genero_texto', 'idade_range', 'idade_texto',
+                'citacao', 'texto_proposta', 'subtitulo_proposta'
+            ];
+            for (let id of idsConfig) {
+                const el = document.getElementById(id);
+                if (el) updates[id] = el.value;
+            }
+
+            // 1. Salvar configurações
+            for (let [chave, valor] of Object.entries(updates)) {
+                await fetch(`${SUPABASE_URL}/rest/v1/site_config?config_key=eq.${chave}`, {
+                    method: 'PATCH',
+                    headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ config_value: valor })
+                });
+            }
+
+            // 2. Salvar portfólio: limpar e reinserir
+            const portfolioItens = [];
+            const cards = document.querySelectorAll('#portfolio-editor .border');
+            let ordem = 0;
+            for (let card of cards) {
+                const inputsImagem = card.querySelector('input[data-campo="imagem_url"]');
+                const inputsLegenda = card.querySelector('input[data-campo="legenda"]');
+                if (inputsImagem && inputsLegenda) {
+                    let id = parseInt(inputsImagem.getAttribute('data-id'));
+                    if (isNaN(id)) id = null;
+                    portfolioItens.push({
+                        id: id,
+                        imagem_url: inputsImagem.value,
+                        legenda: inputsLegenda.value,
+                        ordem: ordem++
+                    });
+                }
+            }
+
+            // Remove todos os projetos antigos
+            await fetch(`${SUPABASE_URL}/rest/v1/portfolio?order=ordem`, {
+                method: 'DELETE',
+                headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
             });
-        }
+            // Insere a nova lista
+            for (let item of portfolioItens) {
+                await fetch(`${SUPABASE_URL}/rest/v1/portfolio`, {
+                    method: 'POST',
+                    headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ imagem_url: item.imagem_url, legenda: item.legenda, ordem: item.ordem })
+                });
+            }
 
-        statusDiv.innerHTML = '<span class="material-symbols-outlined text-green-600 text-base">check_circle</span> Salvo com sucesso!';
-        setTimeout(() => {
-            statusDiv.innerHTML = '<span class="material-symbols-outlined text-[#b80049] text-base">info</span> Pronto para salvar';
-        }, 3000);
-        await carregarDados(); // Recarrega para mostrar os dados atualizados
+            statusDiv.innerHTML = '<span class="material-symbols-outlined text-green-600 text-base">check_circle</span> Salvo com sucesso!';
+            setTimeout(() => {
+                if (document.getElementById('status-msg')) {
+                    document.getElementById('status-msg').innerHTML = originalMsg;
+                }
+            }, 3000);
+            
+            // Recarregar os dados para garantir que a interface reflita o estado atual
+            await carregarDados();
+            
+        } catch (error) {
+            console.error('Erro ao salvar:', error);
+            statusDiv.innerHTML = '<span class="material-symbols-outlined text-red-500 text-base">error</span> Erro ao salvar. Tente novamente.';
+            setTimeout(() => {
+                if (document.getElementById('status-msg')) {
+                    document.getElementById('status-msg').innerHTML = originalMsg;
+                }
+            }, 3000);
+        } finally {
+            salvando = false;
+        }
     }
 
     window.descartarAlteracoes = function() {
