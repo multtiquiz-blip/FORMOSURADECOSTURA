@@ -19,258 +19,134 @@
         .animate-grow { animation: growWidth 0.8s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards; width: 0% !important; }
         .hover-lift { transition: transform 0.2s ease, box-shadow 0.2s ease; }
         .hover-lift:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -12px rgba(184, 0, 73, 0.15); }
-        .btn-ripple { position: relative; overflow: hidden; transition: all 0.2s; }
-        .btn-ripple:active { transform: scale(0.96); }
         .stitching-border { border: 2px dashed #e4bdc2; }
         .soft-shadow { box-shadow: 0 8px 30px rgba(184, 0, 73, 0.08); }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        ::-webkit-scrollbar-thumb { background: #b80049; border-radius: 10px; }
-        @media print {
-            .no-print { display: none !important; }
-            body { background: white; padding: 0; margin: 0; }
-        }
-        
-        /* --- NOVAS REGRAS PARA O VÍDEO --- */
-        /* 1. Container principal para limitar a largura */
-        .video-container {
-            max-width: 100%;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        /* 2. Wrapper responsivo com largura controlada */
-        .video-wrapper {
-            width: 100%;
-            max-width: 800px; /* metade do container original (1280px / 2 ≈ 640px, mas usei 800px para um visual mais confortável) */
-            margin-left: auto;
-            margin-right: auto;
-        }
-        /* 3. Ajuste para telas pequenas */
-        @media (max-width: 768px) {
-            .video-wrapper {
-                max-width: 100%;
-            }
-        }
+        .youtube-lite { position: relative; cursor: pointer; transition: all 0.2s; aspect-ratio: 16/9; background: #000; border-radius: 1rem; overflow: hidden; }
+        .youtube-lite img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
+        .youtube-lite:hover img { transform: scale(1.02); }
+        .youtube-lite .play-button { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 70px; height: 70px; background: rgba(0,0,0,0.7); border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .youtube-lite:hover .play-button { background: #b80049; transform: translate(-50%, -50%) scale(1.05); }
+        .youtube-lite .play-button span { font-size: 40px; color: white; }
+        @media (max-width: 768px) { .youtube-lite .play-button { width: 50px; height: 50px; } .youtube-lite .play-button span { font-size: 28px; } }
+        @media print { .no-print { display: none !important; } body { background: white; } }
     </style>
 </head>
 <body>
 
-    <nav class="sticky top-0 z-50 glass border-b border-white/30 backdrop-blur-md no-print">
-        <div class="max-w-[1280px] mx-auto px-4 md:px-6 py-4 flex justify-between items-center">
-            <span class="text-2xl md:text-3xl font-bold text-[#b80049] tracking-tight font-serif">Tailored Influence</span>
-            <div class="hidden md:flex gap-8 items-center">
-                <a href="#portfolio" class="text-[#1b1c1c] hover:text-[#b80049] font-medium transition">Portfólio</a>
-                <a href="#metricas" class="text-[#1b1c1c] hover:text-[#b80049] font-medium transition">Métricas</a>
-                <a href="#contato" class="text-[#1b1c1c] hover:text-[#b80049] font-medium transition">Contato</a>
-                <button onclick="baixarPDF()" class="bg-[#b80049] text-white px-6 py-2 rounded-full font-bold hover:bg-[#9c003e] transition shadow-md btn-ripple">Baixar Kit (PDF)</button>
+<nav class="sticky top-0 z-50 glass border-b border-white/30 backdrop-blur-md no-print">
+    <div class="max-w-[1280px] mx-auto px-4 md:px-6 py-4 flex justify-between items-center">
+        <span class="text-2xl md:text-3xl font-bold text-[#b80049] tracking-tight font-serif">Tailored Influence</span>
+        <div class="hidden md:flex gap-8 items-center">
+            <a href="#portfolio" class="text-[#1b1c1c] hover:text-[#b80049] font-medium transition">Portfólio</a>
+            <a href="#metricas" class="text-[#1b1c1c] hover:text-[#b80049] font-medium transition">Métricas</a>
+            <a href="#contato" class="text-[#1b1c1c] hover:text-[#b80049] font-medium transition">Contato</a>
+            <button onclick="baixarPDF()" class="bg-[#b80049] text-white px-6 py-2 rounded-full font-bold hover:bg-[#9c003e] transition shadow-md">Baixar Kit (PDF)</button>
+        </div>
+    </div>
+</nav>
+
+<main class="max-w-[1280px] mx-auto px-4 md:px-6 py-8" id="conteudo-principal">
+    <div class="flex justify-center items-center py-20"><div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#b80049]"></div><span class="ml-3 text-[#b80049]">Carregando...</span></div>
+</main>
+
+<footer class="bg-white/50 backdrop-blur-sm border-t border-[#e4bdc2] mt-12 no-print" id="contato">
+    <div class="max-w-[1280px] mx-auto px-4 md:px-6 py-12">
+        <div class="flex flex-col md:flex-row justify-between items-start gap-12">
+            <div class="space-y-4 max-w-sm">
+                <h4 class="text-2xl text-[#b80049] tracking-tight font-serif" id="footer-nome"></h4>
+                <p class="text-[#5b3f43]" id="footer-bio"></p>
+                <div class="flex gap-4" id="social-icons-footer"></div>
+            </div>
+            <div class="space-y-4">
+                <h5 class="text-xs font-bold tracking-wider text-[#b80049] uppercase">Contato direto</h5>
+                <ul class="space-y-2">
+                    <li class="flex items-center gap-2 text-[#5b3f43]"><span class="material-symbols-outlined text-sm">mail</span> <span id="footer-email"></span></li>
+                    <li class="flex items-center gap-2 text-[#5b3f43]"><span class="material-symbols-outlined text-sm">call</span> <span id="footer-phone"></span></li>
+                </ul>
             </div>
         </div>
-    </nav>
+        <div class="mt-12 pt-8 border-t border-[#efeded] text-center text-sm text-[#5d5f5f]">© 2025 Tailored Influence · Todos os direitos reservados</div>
+    </div>
+</footer>
 
-    <main class="max-w-[1280px] mx-auto px-4 md:px-6 py-8" id="conteudo-principal">
-        <div class="flex justify-center items-center py-20">
-            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#b80049]"></div>
-            <span class="ml-3 text-[#b80049]">Carregando dados...</span>
-        </div>
-    </main>
+<script>
+    const SUPABASE_URL = 'https://nhnhqjyrawaftlomlilg.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5obmhxanlyYXdhZnRsb21saWxnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyMDY3ODgsImV4cCI6MjA5Njc4Mjc4OH0.GtOdh4sLzxrwPxOvnKJO5bf4x4hebpuC9RlR-06V0RE';
 
-    <footer class="bg-white/50 backdrop-blur-sm border-t border-[#e4bdc2] mt-12 no-print" id="contato">
-        <div class="max-w-[1280px] mx-auto px-4 md:px-6 py-12">
-            <div class="flex flex-col md:flex-row justify-between items-start gap-12">
-                <div class="space-y-4 max-w-sm">
-                    <h4 class="text-2xl text-[#b80049] tracking-tight font-serif" id="footer-nome">Rose Gerçóssimo</h4>
-                    <p class="text-[#5b3f43]" id="footer-bio"></p>
-                    <div class="flex gap-4" id="social-icons-footer"></div>
+    async function carregarDados() {
+        try {
+            const [configResp, portResp] = await Promise.all([
+                fetch(`${SUPABASE_URL}/rest/v1/site_config?select=config_key,config_value`, { headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` } }),
+                fetch(`${SUPABASE_URL}/rest/v1/portfolio?select=*&order=ordem`, { headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` } })
+            ]);
+            const configArray = await configResp.json();
+            const config = {};
+            configArray.forEach(item => { config[item.config_key] = item.config_value; });
+            const portfolio = await portResp.json();
+
+            const main = document.getElementById('conteudo-principal');
+            main.innerHTML = `
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-16 items-center animate-fade-up">
+                    <div class="lg:col-span-5 relative group"><div class="absolute -inset-3 bg-gradient-to-r from-[#b80049]/20 to-[#e4bdc2]/40 rounded-full blur-2xl"></div><div class="relative w-full aspect-square rounded-full overflow-hidden border-4 border-white shadow-2xl"><img class="w-full h-full object-cover" src="${escapeHtml(config.foto_perfil_url)}" alt="Rose" onerror="this.src='https://placehold.co/600x600'"></div></div>
+                    <div class="lg:col-span-7 space-y-6">
+                        <div><h1 class="text-5xl md:text-7xl font-extrabold text-[#b80049] leading-tight">${escapeHtml(config.nome_profissional)}</h1><h2 class="text-2xl md:text-3xl text-[#5d5f5f] italic mt-2">${escapeHtml(config.sub_nome)}</h2><div class="w-24 h-1 bg-gradient-to-r from-[#b80049] to-[#e4bdc2] my-5 rounded-full"></div><p class="text-xl md:text-2xl text-[#5b3f43] font-medium">${escapeHtml(config.bio_curta)}</p></div>
+                        <div class="flex flex-wrap gap-3"><div class="px-5 py-2.5 bg-[#b80049]/10 rounded-full text-[#b80049] font-bold flex items-center gap-2"><span class="material-symbols-outlined">stars</span> ${escapeHtml(config.tag1)}</div><div class="px-5 py-2.5 bg-[#b80049]/10 rounded-full text-[#b80049] font-bold flex items-center gap-2"><span class="material-symbols-outlined">auto_graph</span> ${escapeHtml(config.tag2)}</div></div>
+                        <div class="flex gap-4 mt-4"><a href="${escapeHtml(config.youtube_url)}" target="_blank" class="w-12 h-12 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition"><span class="material-symbols-outlined text-2xl">smart_display</span></a><a href="${escapeHtml(config.instagram_url)}" target="_blank" class="w-12 h-12 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition"><span class="material-symbols-outlined text-2xl">photo_camera</span></a><a href="${escapeHtml(config.tiktok_url)}" target="_blank" class="w-12 h-12 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition"><span class="material-symbols-outlined text-2xl">music_note</span></a></div>
+                    </div>
                 </div>
-                <div class="space-y-4">
-                    <h5 class="text-xs font-bold tracking-wider text-[#b80049] uppercase">Contato direto</h5>
-                    <ul class="space-y-2">
-                        <li class="flex items-center gap-2 text-[#5b3f43]"><span class="material-symbols-outlined text-sm">mail</span> <span id="footer-email"></span></li>
-                        <li class="flex items-center gap-2 text-[#5b3f43]"><span class="material-symbols-outlined text-sm">call</span> <span id="footer-phone"></span></li>
-                    </ul>
+                ${config.youtube_video_id && config.youtube_video_id.trim() !== '' ? `
+                <div class="mb-16 animate-fade-up" style="animation-delay:0.1s"><h3 class="text-2xl md:text-3xl text-[#b80049] mb-5 font-serif flex items-center gap-2"><span class="material-symbols-outlined">smart_display</span> Vídeo em destaque</h3><div class="max-w-[800px] mx-auto"><div class="youtube-lite" data-id="${escapeHtml(config.youtube_video_id)}"><img src="https://img.youtube.com/vi/${escapeHtml(config.youtube_video_id)}/maxresdefault.jpg" alt="Thumbnail" onerror="this.src='https://img.youtube.com/vi/${escapeHtml(config.youtube_video_id)}/hqdefault.jpg'"><div class="play-button"><span class="material-symbols-outlined">play_arrow</span></div></div></div></div>
+                ` : ''}
+                <div id="metricas" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+                    <div class="bg-white/80 p-6 rounded-2xl soft-shadow border border-white/50 hover-lift"><div class="flex justify-between"><span class="material-symbols-outlined text-[#b80049] text-4xl">brand_family</span><span class="text-xs font-bold uppercase">TikTok Impacto</span></div><div class="mt-8"><div class="text-4xl font-black text-[#b80049]">${escapeHtml(config.tiktok_views)}</div><div class="text-[#5d5f5f] text-sm mt-1">${escapeHtml(config.tiktok_desc)}</div></div><div class="w-full h-1.5 bg-[#efeded] mt-5 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-[#b80049] to-[#e4bdc2] rounded-full" style="--final-width: ${config.tiktok_percent || 0}%; width:0%" data-width="${config.tiktok_percent || 0}"></div></div></div>
+                    <div class="bg-white/80 p-6 rounded-2xl soft-shadow border border-white/50 hover-lift"><div class="flex justify-between"><span class="material-symbols-outlined text-[#b80049] text-4xl">movie_edit</span><span class="text-xs font-bold uppercase">Alcance Reels</span></div><div class="mt-8"><div class="text-4xl font-black text-[#b80049]">${escapeHtml(config.reels_reach)}</div><div class="text-[#5d5f5f] text-sm mt-1">${escapeHtml(config.reels_desc)}</div></div><div class="w-full h-1.5 bg-[#efeded] mt-5 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-[#b80049] to-[#e4bdc2] rounded-full" style="--final-width: ${config.reels_percent || 0}%; width:0%" data-width="${config.reels_percent || 0}"></div></div></div>
+                    <div class="bg-white/80 p-6 rounded-2xl soft-shadow border border-white/50 hover-lift"><div class="flex justify-between"><span class="material-symbols-outlined text-[#b80049] text-4xl">groups</span><span class="text-xs font-bold uppercase">Comunidade</span></div><div class="mt-8"><div class="text-4xl font-black text-[#b80049]">${escapeHtml(config.comunidade_num)}</div><div class="text-[#5d5f5f] text-sm mt-1">${escapeHtml(config.comunidade_desc)}</div></div><div class="flex mt-5 -space-x-2"><div class="w-8 h-8 rounded-full bg-gray-300 border-2 border-white"></div><div class="w-8 h-8 rounded-full bg-[#e4bdc2] border-2 border-white"></div><div class="w-8 h-8 rounded-full bg-[#b80049]/50 border-2 border-white"></div><div class="w-8 h-8 rounded-full bg-[#b80049] text-white flex items-center justify-center text-xs border-2 border-white">+</div></div></div>
+                    <div class="bg-gradient-to-br from-[#b80049] to-[#9c003e] text-white p-6 rounded-2xl shadow-2xl hover-lift"><div class="flex justify-between mb-4"><span class="material-symbols-outlined text-3xl">podcasts</span><span class="px-2 py-1 bg-white/20 rounded-full text-[10px] font-bold uppercase">Destaque</span></div><div class="text-4xl font-black">${escapeHtml(config.live_views)}</div><div class="text-white/80 text-sm mt-1">${escapeHtml(config.live_desc)}</div><p class="mt-4 text-sm">${escapeHtml(config.live_texto_destaque)}</p></div>
                 </div>
-            </div>
-            <div class="mt-12 pt-8 border-t border-[#efeded] text-center text-sm text-[#5d5f5f]">© 2025 Tailored Influence · Todos os direitos reservados</div>
-        </div>
-    </footer>
-
-    <script>
-        const SUPABASE_URL = 'https://nhnhqjyrawaftlomlilg.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5obmhxanlyYXdhZnRsb21saWxnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyMDY3ODgsImV4cCI6MjA5Njc4Mjc4OH0.GtOdh4sLzxrwPxOvnKJO5bf4x4hebpuC9RlR-06V0RE';
-
-        async function carregarDados() {
-            try {
-                const configResp = await fetch(`${SUPABASE_URL}/rest/v1/site_config?select=config_key,config_value`, {
-                    headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16 animate-fade-up" style="animation-delay:0.2s">
+                    <div class="bg-white/80 p-8 rounded-2xl soft-shadow border border-white/50"><h3 class="text-2xl md:text-3xl text-[#b80049] mb-6 flex items-center gap-3"><span class="material-symbols-outlined">pie_chart</span> Perfil da Audiência</h3><div class="grid grid-cols-2 gap-6"><div><div class="text-xs font-bold uppercase text-[#5d5f5f]">Gênero</div><div class="flex items-end gap-2 mt-2"><span class="text-4xl font-black text-[#b80049]">${escapeHtml(config.genero_porcentagem)}</span><span class="material-symbols-outlined text-[#b80049] text-3xl">female</span></div><div class="text-sm mt-1">${escapeHtml(config.genero_texto)}</div></div><div><div class="text-xs font-bold uppercase text-[#5d5f5f]">Idade</div><div class="flex items-end gap-2 mt-2"><span class="text-4xl font-black text-[#b80049]">${escapeHtml(config.idade_range)}</span></div><div class="text-sm mt-1">${escapeHtml(config.idade_texto)}</div></div></div><div class="mt-10 p-6 bg-[#fef5f2] rounded-xl border-l-4 border-[#b80049] italic"><p class="text-lg">“${escapeHtml(config.citacao)}”</p></div></div>
+                    <div class="stitching-border bg-white/80 p-8 rounded-2xl flex flex-col justify-center items-center text-center space-y-6 hover-lift"><div class="w-20 h-20 rounded-full bg-[#b80049]/10 flex items-center justify-center"><span class="material-symbols-outlined text-[#b80049] text-4xl">shopping_cart_checkout</span></div><h3 class="text-3xl md:text-4xl font-bold leading-tight">${escapeHtml(config.texto_proposta)}</h3><p class="text-[#5d5f5f] max-w-md">${escapeHtml(config.subtitulo_proposta)}</p><button class="stitching-border border-[#b80049] text-[#b80049] px-8 py-3 rounded-full font-bold hover:bg-[#b80049] hover:text-white transition">Solicitar proposta</button></div>
+                </div>
+                <div id="portfolio" class="mb-12 animate-fade-up" style="animation-delay:0.3s"><h3 class="text-2xl md:text-3xl text-[#b80049] mb-6 font-serif">Portfólio Criativo</h3><div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4" id="portfolio-grid"></div></div>
+            `;
+            const grid = document.getElementById('portfolio-grid');
+            if (grid && portfolio.length) {
+                grid.innerHTML = '';
+                portfolio.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'group relative aspect-square bg-[#efeded] rounded-xl overflow-hidden shadow-md hover:shadow-xl transition';
+                    card.innerHTML = `<img class="w-full h-full object-cover group-hover:scale-110 transition duration-500" src="${escapeHtml(item.imagem_url)}" alt="${escapeHtml(item.legenda)}"><div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition flex items-end justify-center p-3"><span class="text-white text-xs font-bold uppercase tracking-wider">${escapeHtml(item.legenda)}</span></div>`;
+                    grid.appendChild(card);
                 });
-                const configArray = await configResp.json();
-                const config = {};
-                configArray.forEach(item => { config[item.config_key] = item.config_value; });
-
-                const portResp = await fetch(`${SUPABASE_URL}/rest/v1/portfolio?select=*&order=ordem`, {
-                    headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
-                });
-                const portfolio = await portResp.json();
-
-                const main = document.getElementById('conteudo-principal');
-                main.innerHTML = `
-                    <!-- Hero Section -->
-                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-16 items-center animate-fade-up">
-                        <div class="lg:col-span-5 relative group">
-                            <div class="absolute -inset-3 bg-gradient-to-r from-[#b80049]/20 to-[#e4bdc2]/40 rounded-full blur-2xl animate-pulse"></div>
-                            <div class="relative w-full aspect-square rounded-full overflow-hidden border-4 border-white shadow-2xl transition-transform duration-500 group-hover:scale-[1.02]">
-                                <img class="w-full h-full object-cover" src="${escapeHtml(config.foto_perfil_url)}" alt="Rose" onerror="this.src='https://placehold.co/600x600?text=Foto'">
-                            </div>
-                        </div>
-                        <div class="lg:col-span-7 space-y-6">
-                            <div>
-                                <h1 class="text-5xl md:text-7xl font-extrabold text-[#b80049] leading-tight">${escapeHtml(config.nome_profissional)}</h1>
-                                <h2 class="text-2xl md:text-3xl text-[#5d5f5f] italic mt-2">${escapeHtml(config.sub_nome)}</h2>
-                                <div class="w-24 h-1 bg-gradient-to-r from-[#b80049] to-[#e4bdc2] my-5 rounded-full"></div>
-                                <p class="text-xl md:text-2xl text-[#5b3f43] font-medium leading-relaxed">${escapeHtml(config.bio_curta)}</p>
-                            </div>
-                            <div class="flex flex-wrap gap-3">
-                                <div class="px-5 py-2.5 bg-[#b80049]/10 rounded-full text-[#b80049] font-bold flex items-center gap-2"><span class="material-symbols-outlined">stars</span> ${escapeHtml(config.tag1)}</div>
-                                <div class="px-5 py-2.5 bg-[#b80049]/10 rounded-full text-[#b80049] font-bold flex items-center gap-2"><span class="material-symbols-outlined">auto_graph</span> ${escapeHtml(config.tag2)}</div>
-                            </div>
-                            <div class="flex gap-4 mt-4">
-                                <a href="${escapeHtml(config.youtube_url)}" target="_blank" class="w-12 h-12 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition-all duration-200 shadow-md"><span class="material-symbols-outlined text-2xl">smart_display</span></a>
-                                <a href="${escapeHtml(config.instagram_url)}" target="_blank" class="w-12 h-12 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition-all duration-200 shadow-md"><span class="material-symbols-outlined text-2xl">photo_camera</span></a>
-                                <a href="${escapeHtml(config.tiktok_url)}" target="_blank" class="w-12 h-12 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition-all duration-200 shadow-md"><span class="material-symbols-outlined text-2xl">music_note</span></a>
-                            </div>
-                        </div>
-                    </div>
-
-                    ${config.youtube_video_id && config.youtube_video_id.trim() !== '' && config.youtube_video_id !== 'dQw4w9WgXcQ' ? `
-                    <div class="video-container mb-16 animate-fade-up" style="animation-delay: 0.1s">
-                        <div class="video-wrapper">
-                            <h3 class="text-2xl md:text-3xl text-[#b80049] mb-5 font-serif flex items-center gap-2"><span class="material-symbols-outlined">smart_display</span> Vídeo em destaque</h3>
-                            <div class="relative w-full" style="padding-bottom: 56.25%; height: 0; overflow: hidden;">
-                                <iframe class="absolute top-0 left-0 w-full h-full rounded-2xl overflow-hidden shadow-2xl border border-white/50"
-                                        src="https://www.youtube-nocookie.com/embed/${escapeHtml(config.youtube_video_id)}?rel=0&modestbranding=1&enablejsapi=1&origin=${encodeURIComponent(window.location.origin)}"
-                                        referrerpolicy="strict-origin-when-cross-origin"
-                                        sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-presentation"
-                                        frameborder="0"
-                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                        allowfullscreen>
-                                </iframe>
-                            </div>
-                        </div>
-                    </div>
-                    ` : ''}
-
-                    <div id="metricas" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-                        <div class="bg-white/80 backdrop-blur-sm p-6 rounded-2xl soft-shadow border border-white/50 hover-lift">
-                            <div class="flex justify-between"><span class="material-symbols-outlined text-[#b80049] text-4xl">brand_family</span><span class="text-xs font-bold uppercase tracking-wider text-[#5d5f5f]">TikTok Impacto</span></div>
-                            <div class="mt-8"><div class="text-4xl font-black text-[#b80049]">${escapeHtml(config.tiktok_views)}</div><div class="text-[#5d5f5f] text-sm mt-1">${escapeHtml(config.tiktok_desc)}</div></div>
-                            <div class="w-full h-1.5 bg-[#efeded] mt-5 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-[#b80049] to-[#e4bdc2] rounded-full" style="--final-width: ${config.tiktok_percent || 0}%; width:0%" data-width="${config.tiktok_percent || 0}"></div></div>
-                        </div>
-                        <div class="bg-white/80 backdrop-blur-sm p-6 rounded-2xl soft-shadow border border-white/50 hover-lift">
-                            <div class="flex justify-between"><span class="material-symbols-outlined text-[#b80049] text-4xl">movie_edit</span><span class="text-xs font-bold uppercase tracking-wider">Alcance Reels</span></div>
-                            <div class="mt-8"><div class="text-4xl font-black text-[#b80049]">${escapeHtml(config.reels_reach)}</div><div class="text-[#5d5f5f] text-sm mt-1">${escapeHtml(config.reels_desc)}</div></div>
-                            <div class="w-full h-1.5 bg-[#efeded] mt-5 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-[#b80049] to-[#e4bdc2] rounded-full" style="--final-width: ${config.reels_percent || 0}%; width:0%" data-width="${config.reels_percent || 0}"></div></div>
-                        </div>
-                        <div class="bg-white/80 backdrop-blur-sm p-6 rounded-2xl soft-shadow border border-white/50 hover-lift">
-                            <div class="flex justify-between"><span class="material-symbols-outlined text-[#b80049] text-4xl">groups</span><span class="text-xs font-bold uppercase tracking-wider">Comunidade</span></div>
-                            <div class="mt-8"><div class="text-4xl font-black text-[#b80049]">${escapeHtml(config.comunidade_num)}</div><div class="text-[#5d5f5f] text-sm mt-1">${escapeHtml(config.comunidade_desc)}</div></div>
-                            <div class="flex mt-5 -space-x-2">
-                                <div class="w-8 h-8 rounded-full bg-gray-300 border-2 border-white"></div>
-                                <div class="w-8 h-8 rounded-full bg-[#e4bdc2] border-2 border-white"></div>
-                                <div class="w-8 h-8 rounded-full bg-[#b80049]/50 border-2 border-white"></div>
-                                <div class="w-8 h-8 rounded-full bg-[#b80049] text-white flex items-center justify-center text-xs border-2 border-white">+</div>
-                            </div>
-                        </div>
-                        <div class="bg-gradient-to-br from-[#b80049] to-[#9c003e] text-white p-6 rounded-2xl shadow-2xl hover-lift">
-                            <div class="flex justify-between mb-4"><span class="material-symbols-outlined text-3xl">podcasts</span><span class="px-2 py-1 bg-white/20 rounded-full text-[10px] font-bold uppercase tracking-wider">Destaque</span></div>
-                            <div class="text-4xl font-black">${escapeHtml(config.live_views)}</div>
-                            <div class="text-white/80 text-sm mt-1">${escapeHtml(config.live_desc)}</div>
-                            <p class="mt-4 text-sm leading-relaxed">${escapeHtml(config.live_texto_destaque)}</p>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16 animate-fade-up" style="animation-delay: 0.2s">
-                        <div class="bg-white/80 backdrop-blur-sm p-8 rounded-2xl soft-shadow border border-white/50">
-                            <h3 class="text-2xl md:text-3xl text-[#b80049] mb-6 flex items-center gap-3"><span class="material-symbols-outlined">pie_chart</span> Perfil da Audiência</h3>
-                            <div class="grid grid-cols-2 gap-6">
-                                <div><div class="text-xs font-bold uppercase tracking-wider text-[#5d5f5f]">Gênero</div><div class="flex items-end gap-2 mt-2"><span class="text-4xl font-black text-[#b80049]">${escapeHtml(config.genero_porcentagem)}</span><span class="material-symbols-outlined text-[#b80049] text-3xl">female</span></div><div class="text-sm mt-1">${escapeHtml(config.genero_texto)}</div></div>
-                                <div><div class="text-xs font-bold uppercase tracking-wider text-[#5d5f5f]">Idade</div><div class="flex items-end gap-2 mt-2"><span class="text-4xl font-black text-[#b80049]">${escapeHtml(config.idade_range)}</span></div><div class="text-sm mt-1">${escapeHtml(config.idade_texto)}</div></div>
-                            </div>
-                            <div class="mt-10 p-6 bg-[#fef5f2] rounded-xl border-l-4 border-[#b80049] italic"><p class="text-lg leading-relaxed">“${escapeHtml(config.citacao)}”</p></div>
-                        </div>
-                        <div class="stitching-border bg-white/80 backdrop-blur-sm p-8 rounded-2xl flex flex-col justify-center items-center text-center space-y-6 hover-lift">
-                            <div class="w-20 h-20 rounded-full bg-[#b80049]/10 flex items-center justify-center"><span class="material-symbols-outlined text-[#b80049] text-4xl">shopping_cart_checkout</span></div>
-                            <h3 class="text-3xl md:text-4xl font-bold leading-tight">${escapeHtml(config.texto_proposta)}</h3>
-                            <p class="text-[#5d5f5f] max-w-md">${escapeHtml(config.subtitulo_proposta)}</p>
-                            <button class="stitching-border border-[#b80049] text-[#b80049] px-8 py-3 rounded-full font-bold hover:bg-[#b80049] hover:text-white transition-all duration-300 btn-ripple">Solicitar proposta comercial</button>
-                        </div>
-                    </div>
-
-                    <div id="portfolio" class="mb-12 animate-fade-up" style="animation-delay: 0.3s">
-                        <h3 class="text-2xl md:text-3xl text-[#b80049] mb-6 font-serif">Portfólio Criativo</h3>
-                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4" id="portfolio-grid"></div>
-                    </div>
-                `;
-
-                const grid = document.getElementById('portfolio-grid');
-                if (grid && portfolio.length) {
-                    grid.innerHTML = '';
-                    portfolio.forEach(item => {
-                        const card = document.createElement('div');
-                        card.className = 'group relative aspect-square bg-[#efeded] rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer';
-                        card.innerHTML = `
-                            <img class="w-full h-full object-cover group-hover:scale-110 transition duration-500" src="${escapeHtml(item.imagem_url)}" alt="${escapeHtml(item.legenda)}">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center p-3">
-                                <span class="text-white text-xs font-bold uppercase tracking-wider">${escapeHtml(item.legenda)}</span>
-                            </div>
-                        `;
-                        grid.appendChild(card);
-                    });
-                }
-
-                document.querySelectorAll('[data-width]').forEach(bar => {
-                    const w = bar.getAttribute('data-width');
-                    bar.style.setProperty('--final-width', w + '%');
-                    bar.classList.add('animate-grow');
-                });
-
-                document.getElementById('footer-nome').innerText = config.nome_profissional;
-                document.getElementById('footer-bio').innerText = config.sub_nome;
-                document.getElementById('footer-email').innerText = config.email_contato;
-                document.getElementById('footer-phone').innerText = config.telefone_contato;
-                const footerSocial = document.getElementById('social-icons-footer');
-                if (footerSocial) {
-                    footerSocial.innerHTML = `
-                        <a href="${escapeHtml(config.youtube_url)}" target="_blank" class="w-10 h-10 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition"><span class="material-symbols-outlined">smart_display</span></a>
-                        <a href="${escapeHtml(config.instagram_url)}" target="_blank" class="w-10 h-10 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition"><span class="material-symbols-outlined">photo_camera</span></a>
-                        <a href="${escapeHtml(config.tiktok_url)}" target="_blank" class="w-10 h-10 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition"><span class="material-symbols-outlined">music_note</span></a>
-                    `;
-                }
-
-            } catch (error) {
-                console.error('Erro ao carregar dados:', error);
-                document.getElementById('conteudo-principal').innerHTML = `<div class="text-red-500 text-center p-10">Erro ao carregar dados. Verifique a conexão com o Supabase.</div>`;
             }
-        }
+            document.querySelectorAll('[data-width]').forEach(bar => { bar.style.setProperty('--final-width', bar.getAttribute('data-width') + '%'); bar.classList.add('animate-grow'); });
+            document.getElementById('footer-nome').innerText = config.nome_profissional;
+            document.getElementById('footer-bio').innerText = config.sub_nome;
+            document.getElementById('footer-email').innerText = config.email_contato;
+            document.getElementById('footer-phone').innerText = config.telefone_contato;
+            document.getElementById('social-icons-footer').innerHTML = `<a href="${escapeHtml(config.youtube_url)}" target="_blank" class="w-10 h-10 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition"><span class="material-symbols-outlined">smart_display</span></a><a href="${escapeHtml(config.instagram_url)}" target="_blank" class="w-10 h-10 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition"><span class="material-symbols-outlined">photo_camera</span></a><a href="${escapeHtml(config.tiktok_url)}" target="_blank" class="w-10 h-10 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition"><span class="material-symbols-outlined">music_note</span></a>`;
 
-        function baixarPDF() {
-            const elemento = document.getElementById('conteudo-principal');
-            if (!elemento) return;
-            const opt = {
-                margin: [0.5, 0.5, 0.5, 0.5],
-                filename: 'media-kit-rose.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, letterRendering: true, useCORS: true },
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-            };
-            html2pdf().set(opt).from(elemento).save();
-        }
-
-        function escapeHtml(str) {
-            if (!str) return '';
-            return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m]));
-        }
-
-        carregarDados();
-    </script>
+            // Inicializar YouTube Lite (carrega apenas ao clicar)
+            document.querySelectorAll('.youtube-lite').forEach(container => {
+                container.addEventListener('click', function() {
+                    const videoId = this.dataset.id;
+                    if (!videoId || this.querySelector('iframe')) return;
+                    const iframe = document.createElement('iframe');
+                    iframe.setAttribute('src', `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`);
+                    iframe.setAttribute('frameborder', '0');
+                    iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+                    iframe.setAttribute('allowfullscreen', '');
+                    iframe.classList.add('w-full', 'h-full', 'absolute', 'top-0', 'left-0');
+                    this.innerHTML = '';
+                    this.appendChild(iframe);
+                    this.style.background = 'transparent';
+                });
+            });
+        } catch (err) { console.error(err); document.getElementById('conteudo-principal').innerHTML = `<div class="text-red-500 text-center p-10">Erro: ${err.message}</div>`; }
+    }
+    function baixarPDF() { const el = document.getElementById('conteudo-principal'); if(el) html2pdf().set({ margin: 0.5, filename: 'media-kit-rose.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } }).from(el).save(); }
+    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
+    carregarDados();
+</script>
 </body>
 </html>
