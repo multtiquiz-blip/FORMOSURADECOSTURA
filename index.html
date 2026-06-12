@@ -3,94 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Controle | Rose Gerçóssimo</title>
+    <title>Media Kit | Rose Gerçóssimo</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background: #fbf9f8; }
-        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-        .soft-shadow { box-shadow: 0 4px 20px rgba(184, 0, 73, 0.05); }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #fbf9f8 0%, #fef5f2 100%); color: #1b1c1c; scroll-behavior: smooth; }
+        h1, h2, h3, .font-serif { font-family: 'Playfair Display', serif; }
+        .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-up { animation: fadeUp 0.6s ease-out forwards; }
+        @keyframes growWidth { from { width: 0%; } to { width: var(--final-width); } }
+        .animate-grow { animation: growWidth 0.8s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards; width: 0% !important; }
+        .hover-lift { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .hover-lift:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -12px rgba(184, 0, 73, 0.15); }
+        .btn-ripple { position: relative; overflow: hidden; transition: all 0.2s; }
+        .btn-ripple:active { transform: scale(0.96); }
         .stitching-border { border: 2px dashed #e4bdc2; }
+        .soft-shadow { box-shadow: 0 8px 30px rgba(184, 0, 73, 0.08); }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #b80049; border-radius: 10px; }
+        @media print { .no-print { display: none !important; } body { background: white; } }
     </style>
 </head>
 <body>
 
-<div id="login-container" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#fbf9f8] to-[#fef5f2]">
-    <div class="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full text-center">
-        <div class="w-20 h-20 mx-auto bg-[#b80049]/10 rounded-full flex items-center justify-center mb-4">
-            <span class="material-symbols-outlined text-[#b80049] text-4xl">lock</span>
+<nav class="sticky top-0 z-50 glass border-b border-white/30 backdrop-blur-md no-print">
+    <div class="max-w-[1280px] mx-auto px-4 md:px-6 py-4 flex justify-between items-center">
+        <span class="text-2xl md:text-3xl font-bold text-[#b80049] tracking-tight font-serif">Influência Sob Medida</span>
+        <div class="hidden md:flex gap-8 items-center">
+            <a href="#portfolio" class="text-[#1b1c1c] hover:text-[#b80049] font-medium transition">Portfólio</a>
+            <a href="#metricas" class="text-[#1b1c1c] hover:text-[#b80049] font-medium transition">Métricas</a>
+            <a href="#contato" class="text-[#1b1c1c] hover:text-[#b80049] font-medium transition">Contato</a>
+            <button onclick="baixarPDF()" class="bg-[#b80049] text-white px-6 py-2 rounded-full font-bold hover:bg-[#9c003e] transition shadow-md btn-ripple">Baixar Kit (PDF)</button>
         </div>
-        <h2 class="text-2xl font-bold text-[#b80049] mb-2">Área Restrita</h2>
-        <p class="text-[#5d5f5f] mb-6">Digite a senha para acessar o painel</p>
-        <input type="password" id="senha-input" class="w-full border border-[#e4bdc2] rounded-lg px-4 py-2 focus:outline-none focus:border-[#b80049] mb-4" placeholder="Senha">
-        <button onclick="verificarSenha()" class="w-full bg-[#b80049] text-white py-2 rounded-lg font-bold hover:bg-[#9c003e] transition">Entrar</button>
-        <p id="erro-senha" class="text-red-500 text-sm mt-3 hidden">Senha incorreta. Tente novamente.</p>
     </div>
-</div>
+</nav>
 
-<div id="painel-container" style="display: none;">
-    <div class="max-w-[1280px] mx-auto px-4 md:px-6 py-8">
-        <header class="mb-10 flex justify-between items-center border-b border-dashed border-[#e4bdc2] pb-5">
-            <div>
-                <h1 class="text-4xl font-bold text-[#b80049] font-serif">Painel de Controle</h1>
-                <p class="text-[#5d5f5f]">Gerencie todas as informações do seu Media Kit</p>
-            </div>
-            <div class="flex gap-3">
-                <a href="index.html" target="_blank" class="px-5 py-2 border border-[#b80049] text-[#b80049] rounded-lg hover:bg-[#b80049]/10 flex items-center gap-2">
-                    <span class="material-symbols-outlined">visibility</span> Ver site
-                </a>
-                <button onclick="logout()" class="px-5 py-2 border border-red-500 text-red-500 rounded-lg hover:bg-red-50 flex items-center gap-2">
-                    <span class="material-symbols-outlined">logout</span> Sair
-                </button>
-            </div>
-        </header>
-        <div id="formulario-painel" class="space-y-8">
-            <div class="text-center py-10 text-[#5d5f5f]">Carregando dados...</div>
-        </div>
-        <div class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-dashed border-[#e4bdc2] p-5 z-50">
-            <div class="max-w-[1280px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-                <div class="flex items-center gap-2 text-[#5d5f5f] text-sm" id="status-msg">
-                    <span class="material-symbols-outlined text-[#b80049] text-base">info</span> Pronto para salvar
-                </div>
-                <div class="flex gap-4">
-                    <button onclick="descartarAlteracoes()" class="px-8 py-2 border border-dashed border-[#5d5f5f] text-[#5d5f5f] rounded-lg hover:bg-[#efeded]">Descartar</button>
-                    <button onclick="salvarTudo()" class="px-10 py-2 bg-[#b80049] text-white rounded-lg shadow-md hover:opacity-90 flex items-center gap-2">
-                        <span class="material-symbols-outlined">publish</span> Salvar e publicar
-                    </button>
-                </div>
-            </div>
-        </div>
+<main class="max-w-[1280px] mx-auto px-4 md:px-6 py-8" id="conteudo-principal">
+    <div class="flex justify-center items-center py-20">
+        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#b80049]"></div>
+        <span class="ml-3 text-[#b80049]">Carregando...</span>
     </div>
-</div>
+</main>
+
+<footer class="bg-white/50 backdrop-blur-sm border-t border-[#e4bdc2] mt-12 no-print" id="contato">
+    <div class="max-w-[1280px] mx-auto px-4 md:px-6 py-12">
+        <div class="flex flex-col md:flex-row justify-between items-start gap-12">
+            <div class="space-y-4 max-w-sm">
+                <h4 class="text-2xl text-[#b80049] tracking-tight font-serif" id="footer-nome">Rose Gerçóssimo</h4>
+                <p class="text-[#5b3f43]" id="footer-bio"></p>
+                <div class="flex gap-4" id="social-icons-footer"></div>
+            </div>
+            <div class="space-y-4">
+                <h5 class="text-xs font-bold tracking-wider text-[#b80049] uppercase">Contato direto</h5>
+                <ul class="space-y-2">
+                    <li class="flex items-center gap-2 text-[#5b3f43]"><span class="material-symbols-outlined text-sm">mail</span> <span id="footer-email"></span></li>
+                    <li class="flex items-center gap-2 text-[#5b3f43]"><span class="material-symbols-outlined text-sm">call</span> <span id="footer-phone"></span></li>
+                </ul>
+            </div>
+        </div>
+        <div class="mt-12 pt-8 border-t border-[#efeded] text-center text-sm text-[#5d5f5f]">© 2025 Influência Sob Medida · Todos os direitos reservados</div>
+    </div>
+</footer>
 
 <script>
     const SUPABASE_URL = 'https://nhnhqjyrawaftlomlilg.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5obmhxanlyYXdhZnRsb21saWxnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyMDY3ODgsImV4cCI6MjA5Njc4Mjc4OH0.GtOdh4sLzxrwPxOvnKJO5bf4x4hebpuC9RlR-06V0RE';
-    const SENHA_CORRETA = 'Rose2025';
-    let salvando = false;
-
-    function verificarSenha() {
-        const senha = document.getElementById('senha-input').value;
-        if (senha === SENHA_CORRETA) {
-            document.getElementById('login-container').style.display = 'none';
-            document.getElementById('painel-container').style.display = 'block';
-            carregarDados();
-        } else {
-            const erroEl = document.getElementById('erro-senha');
-            erroEl.classList.remove('hidden');
-            setTimeout(() => erroEl.classList.add('hidden'), 3000);
-        }
-    }
-
-    function logout() {
-        document.getElementById('login-container').style.display = 'flex';
-        document.getElementById('painel-container').style.display = 'none';
-        document.getElementById('senha-input').value = '';
-    }
 
     async function carregarDados() {
-        const container = document.getElementById('formulario-painel');
         try {
             const configResp = await fetch(`${SUPABASE_URL}/rest/v1/site_config?select=config_key,config_value`, {
                 headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
@@ -104,182 +88,130 @@
             });
             const portfolio = await portResp.json();
 
-            renderizarFormulario(config, portfolio);
-        } catch (err) {
-            container.innerHTML = `<div class="bg-red-100 p-6 rounded-xl text-red-700">Erro: ${err.message}</div>`;
-        }
-    }
-
-    function renderizarFormulario(config, portfolio) {
-        const html = `
-            <section class="bg-white p-6 rounded-xl soft-shadow border border-[#e4bdc2]/30">
-                <h2 class="text-2xl text-[#b80049] mb-5 flex items-center gap-2"><span class="material-symbols-outlined">edit_note</span> Dados principais</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Nome profissional</label><input type="text" id="nome_profissional" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.nome_profissional)}"></div>
-                    <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Subnome (título)</label><input type="text" id="sub_nome" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.sub_nome)}"></div>
-                    <div class="md:col-span-2"><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Bio curta</label><input type="text" id="bio_curta" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.bio_curta)}"></div>
-                    <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">E-mail de contato</label><input type="email" id="email_contato" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.email_contato)}"></div>
-                    <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Telefone</label><input type="text" id="telefone_contato" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.telefone_contato)}"></div>
-                    <div class="md:col-span-2"><label class="block text-xs font-bold uppercase text-[#5d5f5f]">URL da foto de perfil</label><input type="text" id="foto_perfil_url" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.foto_perfil_url)}"></div>
+            const main = document.getElementById('conteudo-principal');
+            main.innerHTML = `
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-16 items-center animate-fade-up">
+                    <div class="lg:col-span-5 relative group">
+                        <div class="absolute -inset-3 bg-gradient-to-r from-[#b80049]/20 to-[#e4bdc2]/40 rounded-full blur-2xl"></div>
+                        <div class="relative w-full aspect-square rounded-full overflow-hidden border-4 border-white shadow-2xl">
+                            <img class="w-full h-full object-cover" src="${escapeHtml(config.foto_perfil_url)}" alt="Rose" onerror="this.src='https://placehold.co/600x600?text=Foto'">
+                        </div>
+                    </div>
+                    <div class="lg:col-span-7 space-y-6">
+                        <div>
+                            <h1 class="text-5xl md:text-7xl font-extrabold text-[#b80049] leading-tight">${escapeHtml(config.nome_profissional)}</h1>
+                            <h2 class="text-2xl md:text-3xl text-[#5d5f5f] italic mt-2">${escapeHtml(config.sub_nome)}</h2>
+                            <div class="w-24 h-1 bg-gradient-to-r from-[#b80049] to-[#e4bdc2] my-5 rounded-full"></div>
+                            <p class="text-xl md:text-2xl text-[#5b3f43] font-medium">${escapeHtml(config.bio_curta)}</p>
+                        </div>
+                        <div class="flex flex-wrap gap-3">
+                            <div class="px-5 py-2.5 bg-[#b80049]/10 rounded-full text-[#b80049] font-bold flex items-center gap-2"><span class="material-symbols-outlined">stars</span> ${escapeHtml(config.tag1)}</div>
+                            <div class="px-5 py-2.5 bg-[#b80049]/10 rounded-full text-[#b80049] font-bold flex items-center gap-2"><span class="material-symbols-outlined">auto_graph</span> ${escapeHtml(config.tag2)}</div>
+                        </div>
+                        <div class="flex gap-4 mt-4">
+                            <a href="${escapeHtml(config.youtube_url)}" target="_blank" class="w-12 h-12 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition"><span class="material-symbols-outlined text-2xl">smart_display</span></a>
+                            <a href="${escapeHtml(config.instagram_url)}" target="_blank" class="w-12 h-12 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition"><span class="material-symbols-outlined text-2xl">photo_camera</span></a>
+                            <a href="${escapeHtml(config.tiktok_url)}" target="_blank" class="w-12 h-12 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition"><span class="material-symbols-outlined text-2xl">music_note</span></a>
+                        </div>
+                    </div>
                 </div>
-            </section>
-            <section class="bg-white p-6 rounded-xl soft-shadow border border-[#e4bdc2]/30">
-                <h2 class="text-2xl text-[#b80049] mb-5 flex items-center gap-2"><span class="material-symbols-outlined">share</span> Redes sociais e vídeo</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">YouTube (URL do canal)</label><input type="text" id="youtube_url" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.youtube_url)}"></div>
-                    <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Instagram (URL)</label><input type="text" id="instagram_url" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.instagram_url)}"></div>
-                    <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">TikTok (URL)</label><input type="text" id="tiktok_url" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.tiktok_url)}"></div>
-                    <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">ID do vídeo do YouTube</label><input type="text" id="youtube_video_id" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.youtube_video_id)}"></div>
+                ${config.youtube_video_id && config.youtube_video_id !== '' ? `
+                <div class="mb-16 animate-fade-up">
+                    <h3 class="text-2xl md:text-3xl text-[#b80049] mb-5 font-serif flex items-center gap-2"><span class="material-symbols-outlined">smart_display</span> Vídeo em destaque</h3>
+                    <div class="aspect-video w-full rounded-2xl overflow-hidden shadow-2xl border border-white/50">
+                        <iframe class="w-full h-full" src="https://www.youtube-nocookie.com/embed/${escapeHtml(config.youtube_video_id)}" frameborder="0" referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-presentation" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
                 </div>
-            </section>
-            <section class="bg-white p-6 rounded-xl soft-shadow border border-[#e4bdc2]/30">
-                <h2 class="text-2xl text-[#b80049] mb-5 flex items-center gap-2"><span class="material-symbols-outlined">local_offer</span> Tags / Selos</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Tag 1 (esquerda)</label><input type="text" id="tag1" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.tag1)}"></div>
-                    <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Tag 2 (direita)</label><input type="text" id="tag2" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.tag2)}"></div>
+                ` : ''}
+                <div id="metricas" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+                    <div class="bg-white/80 backdrop-blur-sm p-6 rounded-2xl soft-shadow border border-white/50 hover-lift">
+                        <div class="flex justify-between"><span class="material-symbols-outlined text-[#b80049] text-4xl">brand_family</span><span class="text-xs font-bold uppercase">TikTok Impacto</span></div>
+                        <div class="mt-8"><div class="text-4xl font-black text-[#b80049]">${escapeHtml(config.tiktok_views)}</div><div class="text-[#5d5f5f] text-sm">${escapeHtml(config.tiktok_desc)}</div></div>
+                        <div class="w-full h-1.5 bg-[#efeded] mt-5 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-[#b80049] to-[#e4bdc2] rounded-full" style="--final-width: ${config.tiktok_percent}%; width:0%" data-width="${config.tiktok_percent}"></div></div>
+                    </div>
+                    <div class="bg-white/80 backdrop-blur-sm p-6 rounded-2xl soft-shadow border border-white/50 hover-lift">
+                        <div class="flex justify-between"><span class="material-symbols-outlined text-[#b80049] text-4xl">movie_edit</span><span class="text-xs font-bold uppercase">Alcance Reels</span></div>
+                        <div class="mt-8"><div class="text-4xl font-black text-[#b80049]">${escapeHtml(config.reels_reach)}</div><div class="text-[#5d5f5f] text-sm">${escapeHtml(config.reels_desc)}</div></div>
+                        <div class="w-full h-1.5 bg-[#efeded] mt-5 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-[#b80049] to-[#e4bdc2] rounded-full" style="--final-width: ${config.reels_percent}%; width:0%" data-width="${config.reels_percent}"></div></div>
+                    </div>
+                    <div class="bg-white/80 backdrop-blur-sm p-6 rounded-2xl soft-shadow border border-white/50 hover-lift">
+                        <div class="flex justify-between"><span class="material-symbols-outlined text-[#b80049] text-4xl">groups</span><span class="text-xs font-bold uppercase">Comunidade</span></div>
+                        <div class="mt-8"><div class="text-4xl font-black text-[#b80049]">${escapeHtml(config.comunidade_num)}</div><div class="text-[#5d5f5f] text-sm">${escapeHtml(config.comunidade_desc)}</div></div>
+                        <div class="flex mt-5 -space-x-2">
+                            <div class="w-8 h-8 rounded-full bg-gray-300 border-2 border-white"></div>
+                            <div class="w-8 h-8 rounded-full bg-[#e4bdc2] border-2 border-white"></div>
+                            <div class="w-8 h-8 rounded-full bg-[#b80049]/50 border-2 border-white"></div>
+                            <div class="w-8 h-8 rounded-full bg-[#b80049] text-white flex items-center justify-center text-xs border-2 border-white">+</div>
+                        </div>
+                    </div>
+                    <div class="bg-gradient-to-br from-[#b80049] to-[#9c003e] text-white p-6 rounded-2xl shadow-2xl hover-lift">
+                        <div class="flex justify-between mb-4"><span class="material-symbols-outlined text-3xl">podcasts</span><span class="px-2 py-1 bg-white/20 rounded-full text-[10px] font-bold uppercase">Destaque</span></div>
+                        <div class="text-4xl font-black">${escapeHtml(config.live_views)}</div>
+                        <div class="text-white/80 text-sm">${escapeHtml(config.live_desc)}</div>
+                        <p class="mt-4 text-sm">${escapeHtml(config.live_texto_destaque)}</p>
+                    </div>
                 </div>
-            </section>
-            <section class="bg-white p-6 rounded-xl soft-shadow border border-[#e4bdc2]/30">
-                <h2 class="text-2xl text-[#b80049] mb-5 flex items-center gap-2"><span class="material-symbols-outlined">analytics</span> Métricas sociais</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">TikTok views</label><input type="text" id="tiktok_views" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.tiktok_views)}"><label class="block text-xs mt-2">Descrição</label><input type="text" id="tiktok_desc" value="${escapeHtml(config.tiktok_desc)}" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2"><label class="block text-xs mt-2">Porcentagem</label><input type="number" id="tiktok_percent" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${config.tiktok_percent}"></div>
-                    <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Reels reach</label><input type="text" id="reels_reach" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.reels_reach)}"><label class="block text-xs mt-2">Descrição</label><input type="text" id="reels_desc" value="${escapeHtml(config.reels_desc)}" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2"><label class="block text-xs mt-2">Porcentagem</label><input type="number" id="reels_percent" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${config.reels_percent}"></div>
-                    <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Comunidade</label><input type="text" id="comunidade_num" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.comunidade_num)}"><label class="block text-xs mt-2">Descrição</label><input type="text" id="comunidade_desc" value="${escapeHtml(config.comunidade_desc)}" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2"></div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16 animate-fade-up">
+                    <div class="bg-white/80 backdrop-blur-sm p-8 rounded-2xl soft-shadow border border-white/50">
+                        <h3 class="text-2xl md:text-3xl text-[#b80049] mb-6 flex items-center gap-3"><span class="material-symbols-outlined">pie_chart</span> Perfil da Audiência</h3>
+                        <div class="grid grid-cols-2 gap-6">
+                            <div><div class="text-xs font-bold uppercase text-[#5d5f5f]">Gênero</div><div class="flex items-end gap-2 mt-2"><span class="text-4xl font-black text-[#b80049]">${escapeHtml(config.genero_porcentagem)}</span><span class="material-symbols-outlined text-[#b80049] text-3xl">female</span></div><div class="text-sm">${escapeHtml(config.genero_texto)}</div></div>
+                            <div><div class="text-xs font-bold uppercase text-[#5d5f5f]">Idade</div><div class="flex items-end gap-2 mt-2"><span class="text-4xl font-black text-[#b80049]">${escapeHtml(config.idade_range)}</span></div><div class="text-sm">${escapeHtml(config.idade_texto)}</div></div>
+                        </div>
+                        <div class="mt-10 p-6 bg-[#fef5f2] rounded-xl border-l-4 border-[#b80049] italic"><p class="text-lg">“${escapeHtml(config.citacao)}”</p></div>
+                    </div>
+                    <div class="stitching-border bg-white/80 backdrop-blur-sm p-8 rounded-2xl flex flex-col justify-center items-center text-center space-y-6 hover-lift">
+                        <div class="w-20 h-20 rounded-full bg-[#b80049]/10 flex items-center justify-center"><span class="material-symbols-outlined text-[#b80049] text-4xl">shopping_cart_checkout</span></div>
+                        <h3 class="text-3xl md:text-4xl font-bold leading-tight">${escapeHtml(config.texto_proposta)}</h3>
+                        <p class="text-[#5d5f5f] max-w-md">${escapeHtml(config.subtitulo_proposta)}</p>
+                        <button class="stitching-border border-[#b80049] text-[#b80049] px-8 py-3 rounded-full font-bold hover:bg-[#b80049] hover:text-white transition">Solicitar proposta comercial</button>
+                    </div>
                 </div>
-                <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Live views</label><input type="text" id="live_views" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.live_views)}"><label class="block text-xs mt-2">Descrição</label><input type="text" id="live_desc" value="${escapeHtml(config.live_desc)}" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2"></div>
-                    <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Texto destaque</label><textarea id="live_texto_destaque" rows="2" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2">${escapeHtml(config.live_texto_destaque)}</textarea></div>
-                </div>
-            </section>
-            <section class="bg-white p-6 rounded-xl soft-shadow border border-[#e4bdc2]/30">
-                <h2 class="text-2xl text-[#b80049] mb-5 flex items-center gap-2"><span class="material-symbols-outlined">pie_chart</span> Perfil da audiência</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Porcentagem gênero</label><input type="text" id="genero_porcentagem" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.genero_porcentagem)}"><label class="block text-xs mt-2">Texto</label><input type="text" id="genero_texto" value="${escapeHtml(config.genero_texto)}" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2"></div>
-                    <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Faixa etária</label><input type="text" id="idade_range" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.idade_range)}"><label class="block text-xs mt-2">Texto</label><input type="text" id="idade_texto" value="${escapeHtml(config.idade_texto)}" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2"></div>
-                    <div class="md:col-span-2"><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Citação</label><textarea id="citacao" rows="2" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2">${escapeHtml(config.citacao)}</textarea></div>
-                </div>
-            </section>
-            <section class="bg-white p-6 rounded-xl soft-shadow border border-[#e4bdc2]/30">
-                <h2 class="text-2xl text-[#b80049] mb-5 flex items-center gap-2"><span class="material-symbols-outlined">shopping_cart_checkout</span> Proposta comercial</h2>
-                <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Título</label><input type="text" id="texto_proposta" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.texto_proposta)}"></div>
-                <div class="mt-4"><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Subtítulo</label><textarea id="subtitulo_proposta" rows="2" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2">${escapeHtml(config.subtitulo_proposta)}</textarea></div>
-            </section>
-            <section class="bg-white p-6 rounded-xl soft-shadow border border-[#e4bdc2]/30">
-                <div class="flex justify-between items-center mb-5">
-                    <h2 class="text-2xl text-[#b80049] flex items-center gap-2"><span class="material-symbols-outlined">collections_bookmark</span> Portfólio</h2>
-                    <button onclick="adicionarProjeto()" class="bg-[#b80049]/10 text-[#b80049] px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-1"><span class="material-symbols-outlined text-base">add</span> Adicionar projeto</button>
-                </div>
-                <div id="portfolio-editor" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-            </section>
-        `;
-        document.getElementById('formulario-painel').innerHTML = html;
-        renderizarPortfolioEditor(portfolio);
-    }
-
-    function renderizarPortfolioEditor(portfolio) {
-        const container = document.getElementById('portfolio-editor');
-        if (!container) return;
-        container.innerHTML = '';
-        portfolio.forEach((item) => {
-            const card = document.createElement('div');
-            card.className = 'border border-dashed border-[#e4bdc2] rounded-lg p-3 bg-[#fef8f6]';
-            card.innerHTML = `
-                <div class="aspect-square rounded-md overflow-hidden mb-2">
-                    <img src="${escapeHtml(item.imagem_url)}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x400?text=Imagem+inválida'">
-                </div>
-                <label class="block text-xs font-bold uppercase text-[#5d5f5f] mt-2">URL da imagem</label>
-                <input type="text" data-id="${item.id}" data-campo="imagem_url" class="portfolio-input w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent text-sm" value="${escapeHtml(item.imagem_url)}">
-                <label class="block text-xs font-bold uppercase text-[#5d5f5f] mt-2">Legenda</label>
-                <input type="text" data-id="${item.id}" data-campo="legenda" class="portfolio-input w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent text-sm" value="${escapeHtml(item.legenda)}">
-                <div class="flex justify-between mt-3">
-                    <span class="text-xs text-[#5d5f5f]">Ordem: ${item.ordem}</span>
-                    <button onclick="removerProjeto(${item.id})" class="text-red-500 text-xs hover:underline">Remover</button>
+                <div id="portfolio" class="mb-12 animate-fade-up">
+                    <h3 class="text-2xl md:text-3xl text-[#b80049] mb-6 font-serif">Portfólio Criativo</h3>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4" id="portfolio-grid"></div>
                 </div>
             `;
-            container.appendChild(card);
-        });
-    }
 
-    window.adicionarProjeto = function() {
-        const novoId = Date.now();
-        const container = document.getElementById('portfolio-editor');
-        const card = document.createElement('div');
-        card.className = 'border border-dashed border-[#e4bdc2] rounded-lg p-3 bg-[#fef8f6]';
-        card.innerHTML = `
-            <div class="aspect-square rounded-md overflow-hidden mb-2 bg-gray-200 flex items-center justify-center text-gray-400">Nova imagem</div>
-            <label class="block text-xs font-bold uppercase text-[#5d5f5f] mt-2">URL da imagem</label>
-            <input type="text" data-id="${novoId}" data-campo="imagem_url" class="portfolio-input w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent text-sm" value="https://placehold.co/600x600">
-            <label class="block text-xs font-bold uppercase text-[#5d5f5f] mt-2">Legenda</label>
-            <input type="text" data-id="${novoId}" data-campo="legenda" class="portfolio-input w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent text-sm" value="Novo projeto">
-            <div class="flex justify-between mt-3">
-                <span class="text-xs text-[#5d5f5f]">Novo</span>
-                <button onclick="removerProjeto(${novoId})" class="text-red-500 text-xs hover:underline">Remover</button>
-            </div>
-        `;
-        container.appendChild(card);
-    };
+            const grid = document.getElementById('portfolio-grid');
+            portfolio.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'group relative aspect-square bg-[#efeded] rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer';
+                div.innerHTML = `
+                    <img class="w-full h-full object-cover group-hover:scale-110 transition duration-500" src="${escapeHtml(item.imagem_url)}" alt="${escapeHtml(item.legenda)}">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center p-3">
+                        <span class="text-white text-xs font-bold uppercase tracking-wider">${escapeHtml(item.legenda)}</span>
+                    </div>
+                `;
+                grid.appendChild(div);
+            });
 
-    window.removerProjeto = function(id) {
-        const cards = document.querySelectorAll('#portfolio-editor .border');
-        for (let card of cards) {
-            if (card.innerHTML.includes(`data-id="${id}"`)) {
-                card.remove();
-                break;
-            }
-        }
-    };
+            document.querySelectorAll('[data-width]').forEach(bar => {
+                bar.style.setProperty('--final-width', bar.getAttribute('data-width') + '%');
+                bar.classList.add('animate-grow');
+            });
 
-    async function salvarTudo() {
-        if (salvando) return;
-        salvando = true;
-        const statusDiv = document.getElementById('status-msg');
-        statusDiv.innerHTML = '<span class="material-symbols-outlined text-[#b80049] text-base animate-spin">refresh</span> Salvando...';
-        try {
-            const updates = {};
-            const idsConfig = ['nome_profissional', 'sub_nome', 'bio_curta', 'email_contato', 'telefone_contato', 'foto_perfil_url', 'youtube_url', 'instagram_url', 'tiktok_url', 'youtube_video_id', 'tag1', 'tag2', 'tiktok_views', 'tiktok_desc', 'tiktok_percent', 'reels_reach', 'reels_desc', 'reels_percent', 'comunidade_num', 'comunidade_desc', 'live_views', 'live_desc', 'live_texto_destaque', 'genero_porcentagem', 'genero_texto', 'idade_range', 'idade_texto', 'citacao', 'texto_proposta', 'subtitulo_proposta'];
-            for (let id of idsConfig) {
-                const el = document.getElementById(id);
-                if (el) updates[id] = el.value;
-            }
-            for (let [chave, valor] of Object.entries(updates)) {
-                await fetch(`${SUPABASE_URL}/rest/v1/site_config?config_key=eq.${chave}`, {
-                    method: 'PATCH',
-                    headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ config_value: valor })
-                });
-            }
-            const portfolioItens = [];
-            const cards = document.querySelectorAll('#portfolio-editor .border');
-            let ordem = 0;
-            for (let card of cards) {
-                const img = card.querySelector('input[data-campo="imagem_url"]');
-                const leg = card.querySelector('input[data-campo="legenda"]');
-                if (img && leg) {
-                    let id = parseInt(img.getAttribute('data-id'));
-                    if (isNaN(id)) id = null;
-                    portfolioItens.push({ id, imagem_url: img.value, legenda: leg.value, ordem: ordem++ });
-                }
-            }
-            await fetch(`${SUPABASE_URL}/rest/v1/portfolio?order=ordem`, { method: 'DELETE', headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` } });
-            for (let item of portfolioItens) {
-                await fetch(`${SUPABASE_URL}/rest/v1/portfolio`, {
-                    method: 'POST',
-                    headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ imagem_url: item.imagem_url, legenda: item.legenda, ordem: item.ordem })
-                });
-            }
-            statusDiv.innerHTML = '<span class="material-symbols-outlined text-green-600 text-base">check_circle</span> Salvo com sucesso!';
-            setTimeout(() => { statusDiv.innerHTML = '<span class="material-symbols-outlined text-[#b80049] text-base">info</span> Pronto para salvar'; }, 3000);
-            await carregarDados();
+            document.getElementById('footer-nome').innerText = config.nome_profissional;
+            document.getElementById('footer-bio').innerText = config.sub_nome;
+            document.getElementById('footer-email').innerText = config.email_contato;
+            document.getElementById('footer-phone').innerText = config.telefone_contato;
+            document.getElementById('social-icons-footer').innerHTML = `
+                <a href="${escapeHtml(config.youtube_url)}" target="_blank" class="w-10 h-10 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition"><span class="material-symbols-outlined">smart_display</span></a>
+                <a href="${escapeHtml(config.instagram_url)}" target="_blank" class="w-10 h-10 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition"><span class="material-symbols-outlined">photo_camera</span></a>
+                <a href="${escapeHtml(config.tiktok_url)}" target="_blank" class="w-10 h-10 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition"><span class="material-symbols-outlined">music_note</span></a>
+            `;
         } catch (err) {
-            console.error(err);
-            statusDiv.innerHTML = '<span class="material-symbols-outlined text-red-500 text-base">error</span> Erro ao salvar';
-            setTimeout(() => { statusDiv.innerHTML = '<span class="material-symbols-outlined text-[#b80049] text-base">info</span> Pronto para salvar'; }, 3000);
-        } finally { salvando = false; }
+            document.getElementById('conteudo-principal').innerHTML = `<div class="text-red-500 text-center p-10">Erro ao carregar dados: ${err.message}</div>`;
+        }
     }
 
-    window.descartarAlteracoes = function() { if (confirm('Descartar alterações?')) carregarDados(); };
+    function baixarPDF() {
+        const element = document.getElementById('conteudo-principal');
+        html2pdf().set({ margin: 0.5, filename: 'media-kit-rose.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } }).from(element).save();
+    }
+
     function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
+    carregarDados();
 </script>
 </body>
 </html>
