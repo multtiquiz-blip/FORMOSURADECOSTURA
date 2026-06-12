@@ -30,11 +30,31 @@
             .no-print { display: none !important; }
             body { background: white; padding: 0; margin: 0; }
         }
+        
+        /* --- NOVAS REGRAS PARA O VÍDEO --- */
+        /* 1. Container principal para limitar a largura */
+        .video-container {
+            max-width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        /* 2. Wrapper responsivo com largura controlada */
+        .video-wrapper {
+            width: 100%;
+            max-width: 800px; /* metade do container original (1280px / 2 ≈ 640px, mas usei 800px para um visual mais confortável) */
+            margin-left: auto;
+            margin-right: auto;
+        }
+        /* 3. Ajuste para telas pequenas */
+        @media (max-width: 768px) {
+            .video-wrapper {
+                max-width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <!-- NAVEGAÇÃO (não aparece no PDF) -->
     <nav class="sticky top-0 z-50 glass border-b border-white/30 backdrop-blur-md no-print">
         <div class="max-w-[1280px] mx-auto px-4 md:px-6 py-4 flex justify-between items-center">
             <span class="text-2xl md:text-3xl font-bold text-[#b80049] tracking-tight font-serif">Tailored Influence</span>
@@ -47,7 +67,6 @@
         </div>
     </nav>
 
-    <!-- CONTEÚDO PRINCIPAL (será preenchido dinamicamente) -->
     <main class="max-w-[1280px] mx-auto px-4 md:px-6 py-8" id="conteudo-principal">
         <div class="flex justify-center items-center py-20">
             <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#b80049]"></div>
@@ -55,7 +74,6 @@
         </div>
     </main>
 
-    <!-- RODAPÉ -->
     <footer class="bg-white/50 backdrop-blur-sm border-t border-[#e4bdc2] mt-12 no-print" id="contato">
         <div class="max-w-[1280px] mx-auto px-4 md:px-6 py-12">
             <div class="flex flex-col md:flex-row justify-between items-start gap-12">
@@ -77,14 +95,11 @@
     </footer>
 
     <script>
-        // ==================== SUAS CREDENCIAIS ====================
         const SUPABASE_URL = 'https://nhnhqjyrawaftlomlilg.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5obmhxanlyYXdhZnRsb21saWxnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyMDY3ODgsImV4cCI6MjA5Njc4Mjc4OH0.GtOdh4sLzxrwPxOvnKJO5bf4x4hebpuC9RlR-06V0RE';
-        // ========================================================
 
         async function carregarDados() {
             try {
-                // Buscar configurações
                 const configResp = await fetch(`${SUPABASE_URL}/rest/v1/site_config?select=config_key,config_value`, {
                     headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
                 });
@@ -92,7 +107,6 @@
                 const config = {};
                 configArray.forEach(item => { config[item.config_key] = item.config_value; });
 
-                // Buscar portfólio
                 const portResp = await fetch(`${SUPABASE_URL}/rest/v1/portfolio?select=*&order=ordem`, {
                     headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
                 });
@@ -119,7 +133,6 @@
                                 <div class="px-5 py-2.5 bg-[#b80049]/10 rounded-full text-[#b80049] font-bold flex items-center gap-2"><span class="material-symbols-outlined">stars</span> ${escapeHtml(config.tag1)}</div>
                                 <div class="px-5 py-2.5 bg-[#b80049]/10 rounded-full text-[#b80049] font-bold flex items-center gap-2"><span class="material-symbols-outlined">auto_graph</span> ${escapeHtml(config.tag2)}</div>
                             </div>
-                            <!-- Ícones sociais na hero -->
                             <div class="flex gap-4 mt-4">
                                 <a href="${escapeHtml(config.youtube_url)}" target="_blank" class="w-12 h-12 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition-all duration-200 shadow-md"><span class="material-symbols-outlined text-2xl">smart_display</span></a>
                                 <a href="${escapeHtml(config.instagram_url)}" target="_blank" class="w-12 h-12 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition-all duration-200 shadow-md"><span class="material-symbols-outlined text-2xl">photo_camera</span></a>
@@ -128,24 +141,24 @@
                         </div>
                     </div>
 
-                    <!-- Vídeo do YouTube (somente se houver ID) -->
                     ${config.youtube_video_id && config.youtube_video_id.trim() !== '' && config.youtube_video_id !== 'dQw4w9WgXcQ' ? `
-                    <div class="mb-16 animate-fade-up" style="animation-delay: 0.1s">
-                        <h3 class="text-2xl md:text-3xl text-[#b80049] mb-5 font-serif flex items-center gap-2"><span class="material-symbols-outlined">smart_display</span> Vídeo em destaque</h3>
-                        <div class="aspect-video w-full rounded-2xl overflow-hidden shadow-2xl border border-white/50">
-                            <iframe class="w-full h-full" 
-                                    src="https://www.youtube.com/embed/${escapeHtml(config.youtube_video_id)}?rel=0&modestbranding=1" 
-                                    referrerpolicy="strict-origin-when-cross-origin"
-                                    sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-presentation"
-                                    frameborder="0" 
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                                    allowfullscreen>
-                            </iframe>
+                    <div class="video-container mb-16 animate-fade-up" style="animation-delay: 0.1s">
+                        <div class="video-wrapper">
+                            <h3 class="text-2xl md:text-3xl text-[#b80049] mb-5 font-serif flex items-center gap-2"><span class="material-symbols-outlined">smart_display</span> Vídeo em destaque</h3>
+                            <div class="relative w-full" style="padding-bottom: 56.25%; height: 0; overflow: hidden;">
+                                <iframe class="absolute top-0 left-0 w-full h-full rounded-2xl overflow-hidden shadow-2xl border border-white/50"
+                                        src="https://www.youtube-nocookie.com/embed/${escapeHtml(config.youtube_video_id)}?rel=0&modestbranding=1&enablejsapi=1&origin=${encodeURIComponent(window.location.origin)}"
+                                        referrerpolicy="strict-origin-when-cross-origin"
+                                        sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-presentation"
+                                        frameborder="0"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                        allowfullscreen>
+                                </iframe>
+                            </div>
                         </div>
                     </div>
                     ` : ''}
 
-                    <!-- Métricas (grid) -->
                     <div id="metricas" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
                         <div class="bg-white/80 backdrop-blur-sm p-6 rounded-2xl soft-shadow border border-white/50 hover-lift">
                             <div class="flex justify-between"><span class="material-symbols-outlined text-[#b80049] text-4xl">brand_family</span><span class="text-xs font-bold uppercase tracking-wider text-[#5d5f5f]">TikTok Impacto</span></div>
@@ -175,7 +188,6 @@
                         </div>
                     </div>
 
-                    <!-- Perfil da Audiência + Proposta -->
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16 animate-fade-up" style="animation-delay: 0.2s">
                         <div class="bg-white/80 backdrop-blur-sm p-8 rounded-2xl soft-shadow border border-white/50">
                             <h3 class="text-2xl md:text-3xl text-[#b80049] mb-6 flex items-center gap-3"><span class="material-symbols-outlined">pie_chart</span> Perfil da Audiência</h3>
@@ -193,14 +205,12 @@
                         </div>
                     </div>
 
-                    <!-- Portfólio -->
                     <div id="portfolio" class="mb-12 animate-fade-up" style="animation-delay: 0.3s">
                         <h3 class="text-2xl md:text-3xl text-[#b80049] mb-6 font-serif">Portfólio Criativo</h3>
                         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4" id="portfolio-grid"></div>
                     </div>
                 `;
 
-                // Preencher os itens do portfólio
                 const grid = document.getElementById('portfolio-grid');
                 if (grid && portfolio.length) {
                     grid.innerHTML = '';
@@ -217,14 +227,12 @@
                     });
                 }
 
-                // Animar barras de progresso
                 document.querySelectorAll('[data-width]').forEach(bar => {
                     const w = bar.getAttribute('data-width');
                     bar.style.setProperty('--final-width', w + '%');
                     bar.classList.add('animate-grow');
                 });
 
-                // Atualizar rodapé
                 document.getElementById('footer-nome').innerText = config.nome_profissional;
                 document.getElementById('footer-bio').innerText = config.sub_nome;
                 document.getElementById('footer-email').innerText = config.email_contato;
@@ -244,7 +252,6 @@
             }
         }
 
-        // Função para baixar o PDF (ignora navegação e rodapé)
         function baixarPDF() {
             const elemento = document.getElementById('conteudo-principal');
             if (!elemento) return;
