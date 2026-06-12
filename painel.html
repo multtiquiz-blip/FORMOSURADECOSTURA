@@ -16,6 +16,7 @@
 </head>
 <body>
 
+<!-- Tela de login -->
 <div id="login-container" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#fbf9f8] to-[#fef5f2]">
     <div class="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full text-center">
         <div class="w-20 h-20 mx-auto bg-[#b80049]/10 rounded-full flex items-center justify-center mb-4">
@@ -29,12 +30,13 @@
     </div>
 </div>
 
+<!-- Painel principal -->
 <div id="painel-container" style="display: none;">
     <div class="max-w-[1280px] mx-auto px-4 md:px-6 py-8">
         <header class="mb-10 flex justify-between items-center border-b border-dashed border-[#e4bdc2] pb-5">
             <div>
                 <h1 class="text-4xl font-bold text-[#b80049] font-serif">Painel de Controle</h1>
-                <p class="text-[#5d5f5f]">Gerencie todas as informações do seu Media Kit</p>
+                <p class="text-[#5d5f5f]">Gerencie todas as informações do seu Kit de Mídia</p>
             </div>
             <div class="flex gap-3">
                 <a href="index.html" target="_blank" class="px-5 py-2 border border-[#b80049] text-[#b80049] rounded-lg hover:bg-[#b80049]/10 flex items-center gap-2">
@@ -45,9 +47,12 @@
                 </button>
             </div>
         </header>
+
         <div id="formulario-painel" class="space-y-8">
             <div class="text-center py-10 text-[#5d5f5f]">Carregando dados...</div>
         </div>
+
+        <!-- Barra fixa de ações -->
         <div class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-dashed border-[#e4bdc2] p-5 z-50">
             <div class="max-w-[1280px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
                 <div class="flex items-center gap-2 text-[#5d5f5f] text-sm" id="status-msg">
@@ -91,6 +96,7 @@
 
     async function carregarDados() {
         const container = document.getElementById('formulario-painel');
+        container.innerHTML = '<div class="text-center py-10 text-[#5d5f5f]">Carregando dados...</div>';
         try {
             const configResp = await fetch(`${SUPABASE_URL}/rest/v1/site_config?select=config_key,config_value`, {
                 headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
@@ -106,12 +112,14 @@
 
             renderizarFormulario(config, portfolio);
         } catch (err) {
+            console.error(err);
             container.innerHTML = `<div class="bg-red-100 p-6 rounded-xl text-red-700">Erro: ${err.message}</div>`;
         }
     }
 
     function renderizarFormulario(config, portfolio) {
         const html = `
+            <!-- Dados principais -->
             <section class="bg-white p-6 rounded-xl soft-shadow border border-[#e4bdc2]/30">
                 <h2 class="text-2xl text-[#b80049] mb-5 flex items-center gap-2"><span class="material-symbols-outlined">edit_note</span> Dados principais</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -123,6 +131,8 @@
                     <div class="md:col-span-2"><label class="block text-xs font-bold uppercase text-[#5d5f5f]">URL da foto de perfil</label><input type="text" id="foto_perfil_url" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.foto_perfil_url)}"></div>
                 </div>
             </section>
+
+            <!-- Redes sociais e vídeo -->
             <section class="bg-white p-6 rounded-xl soft-shadow border border-[#e4bdc2]/30">
                 <h2 class="text-2xl text-[#b80049] mb-5 flex items-center gap-2"><span class="material-symbols-outlined">share</span> Redes sociais e vídeo</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -132,6 +142,8 @@
                     <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">ID do vídeo do YouTube</label><input type="text" id="youtube_video_id" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.youtube_video_id)}"></div>
                 </div>
             </section>
+
+            <!-- Tags / Selos -->
             <section class="bg-white p-6 rounded-xl soft-shadow border border-[#e4bdc2]/30">
                 <h2 class="text-2xl text-[#b80049] mb-5 flex items-center gap-2"><span class="material-symbols-outlined">local_offer</span> Tags / Selos</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -139,6 +151,8 @@
                     <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Tag 2 (direita)</label><input type="text" id="tag2" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.tag2)}"></div>
                 </div>
             </section>
+
+            <!-- Métricas sociais -->
             <section class="bg-white p-6 rounded-xl soft-shadow border border-[#e4bdc2]/30">
                 <h2 class="text-2xl text-[#b80049] mb-5 flex items-center gap-2"><span class="material-symbols-outlined">analytics</span> Métricas sociais</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -151,6 +165,8 @@
                     <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Texto destaque</label><textarea id="live_texto_destaque" rows="2" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2">${escapeHtml(config.live_texto_destaque)}</textarea></div>
                 </div>
             </section>
+
+            <!-- Perfil da audiência -->
             <section class="bg-white p-6 rounded-xl soft-shadow border border-[#e4bdc2]/30">
                 <h2 class="text-2xl text-[#b80049] mb-5 flex items-center gap-2"><span class="material-symbols-outlined">pie_chart</span> Perfil da audiência</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -159,17 +175,22 @@
                     <div class="md:col-span-2"><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Citação</label><textarea id="citacao" rows="2" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2">${escapeHtml(config.citacao)}</textarea></div>
                 </div>
             </section>
+
+            <!-- Proposta comercial -->
             <section class="bg-white p-6 rounded-xl soft-shadow border border-[#e4bdc2]/30">
                 <h2 class="text-2xl text-[#b80049] mb-5 flex items-center gap-2"><span class="material-symbols-outlined">shopping_cart_checkout</span> Proposta comercial</h2>
                 <div><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Título</label><input type="text" id="texto_proposta" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2" value="${escapeHtml(config.texto_proposta)}"></div>
                 <div class="mt-4"><label class="block text-xs font-bold uppercase text-[#5d5f5f]">Subtítulo</label><textarea id="subtitulo_proposta" rows="2" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 bg-transparent py-2">${escapeHtml(config.subtitulo_proposta)}</textarea></div>
             </section>
+
+            <!-- Gerenciador de portfólio -->
             <section class="bg-white p-6 rounded-xl soft-shadow border border-[#e4bdc2]/30">
                 <div class="flex justify-between items-center mb-5">
                     <h2 class="text-2xl text-[#b80049] flex items-center gap-2"><span class="material-symbols-outlined">collections_bookmark</span> Portfólio</h2>
-                    <button onclick="adicionarProjeto()" class="bg-[#b80049]/10 text-[#b80049] px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-1"><span class="material-symbols-outlined text-base">add</span> Adicionar projeto</button>
+                    <button onclick="adicionarProjeto()" class="bg-[#b80049]/10 text-[#b80049] px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-1 hover:bg-[#b80049]/20 transition"><span class="material-symbols-outlined text-base">add</span> Adicionar projeto</button>
                 </div>
                 <div id="portfolio-editor" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                <div class="mt-4 text-xs text-[#5d5f5f] text-center border-t pt-3">💡 Dica: Use o botão "Remover" para eliminar projetos duplicados ou indesejados.</div>
             </section>
         `;
         document.getElementById('formulario-painel').innerHTML = html;
@@ -180,6 +201,7 @@
         const container = document.getElementById('portfolio-editor');
         if (!container) return;
         container.innerHTML = '';
+        // Exibe os itens do portfólio na ordem atual
         portfolio.forEach((item) => {
             const card = document.createElement('div');
             card.className = 'border border-dashed border-[#e4bdc2] rounded-lg p-3 bg-[#fef8f6]';
@@ -235,6 +257,7 @@
         const statusDiv = document.getElementById('status-msg');
         statusDiv.innerHTML = '<span class="material-symbols-outlined text-[#b80049] text-base animate-spin">refresh</span> Salvando...';
         try {
+            // 1. Salvar configurações (site_config)
             const updates = {};
             const idsConfig = ['nome_profissional', 'sub_nome', 'bio_curta', 'email_contato', 'telefone_contato', 'foto_perfil_url', 'youtube_url', 'instagram_url', 'tiktok_url', 'youtube_video_id', 'tag1', 'tag2', 'tiktok_views', 'tiktok_desc', 'tiktok_percent', 'reels_reach', 'reels_desc', 'reels_percent', 'comunidade_num', 'comunidade_desc', 'live_views', 'live_desc', 'live_texto_destaque', 'genero_porcentagem', 'genero_texto', 'idade_range', 'idade_texto', 'citacao', 'texto_proposta', 'subtitulo_proposta'];
             for (let id of idsConfig) {
@@ -248,18 +271,21 @@
                     body: JSON.stringify({ config_value: valor })
                 });
             }
+
+            // 2. Salvar portfólio (substituir tudo)
             const portfolioItens = [];
             const cards = document.querySelectorAll('#portfolio-editor .border');
             let ordem = 0;
             for (let card of cards) {
                 const img = card.querySelector('input[data-campo="imagem_url"]');
                 const leg = card.querySelector('input[data-campo="legenda"]');
-                if (img && leg) {
+                if (img && leg && img.value.trim() !== '') { // ignora URLs vazias
                     let id = parseInt(img.getAttribute('data-id'));
                     if (isNaN(id)) id = null;
                     portfolioItens.push({ id, imagem_url: img.value, legenda: leg.value, ordem: ordem++ });
                 }
             }
+            // Remove todos os registros existentes e insere os novos
             await fetch(`${SUPABASE_URL}/rest/v1/portfolio?order=ordem`, { method: 'DELETE', headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` } });
             for (let item of portfolioItens) {
                 await fetch(`${SUPABASE_URL}/rest/v1/portfolio`, {
@@ -268,17 +294,20 @@
                     body: JSON.stringify({ imagem_url: item.imagem_url, legenda: item.legenda, ordem: item.ordem })
                 });
             }
+
             statusDiv.innerHTML = '<span class="material-symbols-outlined text-green-600 text-base">check_circle</span> Salvo com sucesso!';
             setTimeout(() => { statusDiv.innerHTML = '<span class="material-symbols-outlined text-[#b80049] text-base">info</span> Pronto para salvar'; }, 3000);
-            await carregarDados();
+            await carregarDados(); // recarrega para exibir a lista limpa
         } catch (err) {
             console.error(err);
-            statusDiv.innerHTML = '<span class="material-symbols-outlined text-red-500 text-base">error</span> Erro ao salvar';
-            setTimeout(() => { statusDiv.innerHTML = '<span class="material-symbols-outlined text-[#b80049] text-base">info</span> Pronto para salvar'; }, 3000);
-        } finally { salvando = false; }
+            statusDiv.innerHTML = '<span class="material-symbols-outlined text-red-500 text-base">error</span> Erro ao salvar. Tente novamente.';
+            setTimeout(() => { statusDiv.innerHTML = '<span class="material-symbols-outlined text-[#b80049] text-base">info</span> Pronto para salvar'; }, 4000);
+        } finally {
+            salvando = false;
+        }
     }
 
-    window.descartarAlteracoes = function() { if (confirm('Descartar alterações?')) carregarDados(); };
+    window.descartarAlteracoes = function() { if (confirm('Descartar todas as alterações não salvas?')) carregarDados(); };
     function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
 </script>
 </body>
