@@ -29,6 +29,21 @@
         .youtube-lite .play-button span { font-size: 40px; color: white; }
         @media (max-width: 768px) { .youtube-lite .play-button { width: 50px; height: 50px; } .youtube-lite .play-button span { font-size: 28px; } }
         @media print { .no-print { display: none !important; } body { background: white; } }
+        
+        /* 🔧 RESPONSIVIDADE ADICIONAL PARA IFRAME (Fallback) */
+        .video-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 1rem;
+        }
     </style>
 </head>
 <body>
@@ -193,9 +208,26 @@
                     <div class="flex gap-4 mt-4"><a href="${escapeHtml(config.youtube_url)}" target="_blank" class="w-12 h-12 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition"><span class="material-symbols-outlined text-2xl">smart_display</span></a><a href="${escapeHtml(config.instagram_url)}" target="_blank" class="w-12 h-12 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition"><span class="material-symbols-outlined text-2xl">photo_camera</span></a><a href="${escapeHtml(config.tiktok_url)}" target="_blank" class="w-12 h-12 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition"><span class="material-symbols-outlined text-2xl">music_note</span></a></div>
                 </div>
             </div>
-            ${config.youtube_video_id && config.youtube_video_id.trim() !== '' ? `
-            <div class="mb-16 animate-fade-up" style="animation-delay:0.1s"><h3 class="text-2xl md:text-3xl text-[#b80049] mb-5 font-serif flex items-center gap-2"><span class="material-symbols-outlined">smart_display</span> Vídeo em destaque</h3><div class="max-w-[800px] mx-auto"><div class="youtube-lite" data-id="${escapeHtml(config.youtube_video_id)}"><img src="https://img.youtube.com/vi/${escapeHtml(config.youtube_video_id)}/maxresdefault.jpg" alt="Thumbnail" onerror="this.src='https://img.youtube.com/vi/${escapeHtml(config.youtube_video_id)}/hqdefault.jpg'"><div class="play-button"><span class="material-symbols-outlined">play_arrow</span></div></div></div></div>
-            ` : ''}
+            
+            <!-- 🎬 YOUTUBE PLAYER RESPONSIVO - INTEGRAÇÃO DIRETA -->
+            <div class="mb-16 animate-fade-up" style="animation-delay:0.1s">
+                <h3 class="text-2xl md:text-3xl text-[#b80049] mb-5 font-serif flex items-center gap-2">
+                    <span class="material-symbols-outlined">smart_display</span> 
+                    Vídeo em destaque
+                </h3>
+                <div class="relative w-full aspect-video rounded-xl overflow-hidden shadow-2xl bg-black">
+                    <iframe 
+                        src="https://www.youtube.com/embed/lYiAiQhrGoU?autoplay=0&rel=0&modestbranding=1"
+                        title="Porta Batom Chaveiro - Formosura de Costura"
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        class="absolute top-0 left-0 w-full h-full"
+                        loading="lazy"
+                    ></iframe>
+                </div>
+            </div>
+            
             <div id="metricas" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
                 <div class="bg-white/80 p-6 rounded-2xl soft-shadow border border-white/50 hover-lift"><div class="flex justify-between"><span class="material-symbols-outlined text-[#b80049] text-4xl">brand_family</span><span class="text-xs font-bold uppercase">TikTok Impacto</span></div><div class="mt-8"><div class="text-4xl font-black text-[#b80049]">${escapeHtml(config.tiktok_views)}</div><div class="text-[#5d5f5f] text-sm mt-1">${escapeHtml(config.tiktok_desc)}</div></div><div class="w-full h-1.5 bg-[#efeded] mt-5 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-[#b80049] to-[#e4bdc2] rounded-full" style="--final-width: ${config.tiktok_percent || 0}%; width:0%" data-width="${config.tiktok_percent || 0}"></div></div></div>
                 <div class="bg-white/80 p-6 rounded-2xl soft-shadow border border-white/50 hover-lift"><div class="flex justify-between"><span class="material-symbols-outlined text-[#b80049] text-4xl">movie_edit</span><span class="text-xs font-bold uppercase">Alcance Reels</span></div><div class="mt-8"><div class="text-4xl font-black text-[#b80049]">${escapeHtml(config.reels_reach)}</div><div class="text-[#5d5f5f] text-sm mt-1">${escapeHtml(config.reels_desc)}</div></div><div class="w-full h-1.5 bg-[#efeded] mt-5 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-[#b80049] to-[#e4bdc2] rounded-full" style="--final-width: ${config.reels_percent || 0}%; width:0%" data-width="${config.reels_percent || 0}"></div></div></div>
@@ -251,26 +283,8 @@
         document.getElementById('footer-phone').innerText = config.telefone_contato || '';
         document.getElementById('social-icons-footer').innerHTML = `<a href="${escapeHtml(config.youtube_url)}" target="_blank" class="w-10 h-10 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition"><span class="material-symbols-outlined">smart_display</span></a><a href="${escapeHtml(config.instagram_url)}" target="_blank" class="w-10 h-10 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition"><span class="material-symbols-outlined">photo_camera</span></a><a href="${escapeHtml(config.tiktok_url)}" target="_blank" class="w-10 h-10 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition"><span class="material-symbols-outlined">music_note</span></a>`;
 
-        // 🎬 YOUTUBE LITE INIT (Camada 11 - sem memory leak)
-        document.querySelectorAll('.youtube-lite').forEach(container => {
-            // Remove listeners antigos para evitar duplicação
-            const newContainer = container.cloneNode(true);
-            container.parentNode.replaceChild(newContainer, container);
-            
-            newContainer.addEventListener('click', function() {
-                const videoId = this.dataset.id;
-                if (!videoId || this.querySelector('iframe')) return;
-                const iframe = document.createElement('iframe');
-                iframe.setAttribute('src', `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`);
-                iframe.setAttribute('frameborder', '0');
-                iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
-                iframe.setAttribute('allowfullscreen', '');
-                iframe.classList.add('w-full', 'h-full', 'absolute', 'top-0', 'left-0');
-                this.innerHTML = '';
-                this.appendChild(iframe);
-                this.style.background = 'transparent';
-            });
-        });
+        // 🎬 YOUTUBE LITE INIT (Camada 11 - sem memory leak) - REMOVIDO PORQUE AGORA É IFRAME DIRETO
+        // O código original do youtube-lite foi mantido no CSS para compatibilidade, mas não é mais usado
     }
     
     function baixarPDF() { 
