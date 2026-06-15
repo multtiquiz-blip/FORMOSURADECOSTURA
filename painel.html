@@ -37,6 +37,7 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5obmhxanlyYXdhZnRsb21saWxnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyMDY3ODgsImV4cCI6MjA5Njc4Mjc4OH0.GtOdh4sLzxrwPxOvnKJO5bf4x4hebpuC9RlR-06V0RE';
     const SENHA_CORRETA = 'Rose2025';
     let salvando = false;
+    let portfolioOriginalIds = new Set(); // 🔧 Controle de IDs originais para evitar duplicação
 
     function verificarSenha() { const senha = document.getElementById('senha-input').value; if(senha === SENHA_CORRETA){ document.getElementById('login-container').style.display='none'; document.getElementById('painel-container').style.display='block'; carregarDados(); } else { const e=document.getElementById('erro-senha'); e.classList.remove('hidden'); setTimeout(()=>e.classList.add('hidden'),3000); } }
     function logout() { document.getElementById('login-container').style.display='flex'; document.getElementById('painel-container').style.display='none'; document.getElementById('senha-input').value=''; }
@@ -51,6 +52,11 @@
             ]);
             const configArray = await configResp.json(); const config = {}; configArray.forEach(i=>config[i.config_key]=i.config_value);
             const portfolio = await portResp.json();
+            
+            // 🔧 Armazenar IDs originais para controle
+            portfolioOriginalIds.clear();
+            portfolio.forEach(item => portfolioOriginalIds.add(item.id));
+            
             renderizarFormulario(config, portfolio);
         } catch(e){ container.innerHTML=`<div class="bg-red-100 p-6 rounded-xl">Erro: ${e.message}</div>`; }
     }
@@ -89,13 +95,14 @@
                 <div class="md:col-span-2"><label class="block text-xs font-bold uppercase">Citação</label><textarea id="citacao" rows="2" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 py-2">${escapeHtml(config.citacao)}</textarea></div>
             </div></section>
             <section class="bg-white p-6 rounded-xl soft-shadow border"><h2 class="text-2xl text-[#b80049] mb-5 flex gap-2"><span class="material-symbols-outlined">shopping_cart_checkout</span> Proposta comercial</h2><div><label class="block text-xs font-bold uppercase">Título</label><input type="text" id="texto_proposta" value="${escapeHtml(config.texto_proposta)}" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 py-2"></div><div class="mt-4"><label class="block text-xs font-bold uppercase">Subtítulo</label><textarea id="subtitulo_proposta" rows="2" class="w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 py-2">${escapeHtml(config.subtitulo_proposta)}</textarea></div></section>
-            <section class="bg-white p-6 rounded-xl soft-shadow border"><div class="flex justify-between items-center mb-5"><h2 class="text-2xl text-[#b80049] flex gap-2"><span class="material-symbols-outlined">collections_bookmark</span> Portfólio</h2><button onclick="adicionarProjeto()" class="bg-[#b80049]/10 text-[#b80049] px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-1"><span class="material-symbols-outlined text-base">add</span> Adicionar</button></div><div id="portfolio-editor" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div><div class="mt-4 text-xs text-center text-[#5d5f5f] border-t pt-3">💡 Para evitar duplicatas, use "Remover" antes de adicionar novos itens iguais. O sistema substitui completamente a lista ao salvar.</div></section>
+            <section class="bg-white p-6 rounded-xl soft-shadow border"><div class="flex justify-between items-center mb-5"><h2 class="text-2xl text-[#b80049] flex gap-2"><span class="material-symbols-outlined">collections_bookmark</span> Portfólio</h2><button onclick="adicionarProjeto()" class="bg-[#b80049]/10 text-[#b80049] px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-1"><span class="material-symbols-outlined text-base">add</span> Adicionar</button></div><div id="portfolio-editor" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div><div class="mt-4 text-xs text-center text-[#5d5f5f] border-t pt-3">💡 O sistema atualiza individualmente sem apagar tudo. Items removidos são deletados, novos são criados.</div></section>
         `;
         document.getElementById('formulario-painel').innerHTML = html;
         const container = document.getElementById('portfolio-editor');
         container.innerHTML = '';
         portfolio.forEach(item => {
             const card = document.createElement('div'); card.className = 'border border-dashed border-[#e4bdc2] rounded-lg p-3 bg-[#fef8f6]';
+            card.setAttribute('data-portfolio-id', item.id);
             card.innerHTML = `<div class="aspect-square rounded-md overflow-hidden mb-2"><img src="${escapeHtml(item.imagem_url)}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x400'"></div><label class="block text-xs font-bold uppercase mt-2">URL da imagem</label><input type="text" data-id="${item.id}" data-campo="imagem_url" class="portfolio-input w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 text-sm" value="${escapeHtml(item.imagem_url)}"><label class="block text-xs font-bold uppercase mt-2">Legenda</label><input type="text" data-id="${item.id}" data-campo="legenda" class="portfolio-input w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 text-sm" value="${escapeHtml(item.legenda)}"><div class="flex justify-between mt-3"><span class="text-xs">Ordem: ${item.ordem}</span><button onclick="removerProjeto(${item.id})" class="text-red-500 text-xs hover:underline">Remover</button></div>`;
             container.appendChild(card);
         });
@@ -105,33 +112,132 @@
         const novoId = Date.now();
         const container = document.getElementById('portfolio-editor');
         const card = document.createElement('div'); card.className = 'border border-dashed border-[#e4bdc2] rounded-lg p-3 bg-[#fef8f6]';
+        card.setAttribute('data-portfolio-id', `new-${novoId}`);
         card.innerHTML = `<div class="aspect-square rounded-md overflow-hidden mb-2 bg-gray-200 flex items-center justify-center">Nova imagem</div><label class="block text-xs font-bold uppercase mt-2">URL da imagem</label><input type="text" data-id="${novoId}" data-campo="imagem_url" class="portfolio-input w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 text-sm" value="https://placehold.co/600x600"><label class="block text-xs font-bold uppercase mt-2">Legenda</label><input type="text" data-id="${novoId}" data-campo="legenda" class="portfolio-input w-full border-0 border-b border-[#e4bdc2] focus:border-[#b80049] focus:ring-0 text-sm" value="Novo projeto"><div class="flex justify-between mt-3"><span class="text-xs">Novo</span><button onclick="removerProjeto(${novoId})" class="text-red-500 text-xs hover:underline">Remover</button></div>`;
         container.appendChild(card);
     };
-    window.removerProjeto = function(id) { document.querySelectorAll('#portfolio-editor .border').forEach(card => { if(card.innerHTML.includes(`data-id="${id}"`)) card.remove(); }); };
+    
+    window.removerProjeto = function(id) { 
+        const cards = document.querySelectorAll('#portfolio-editor .border');
+        for(let card of cards) {
+            const input = card.querySelector(`input[data-id="${id}"]`);
+            if(input) {
+                card.remove();
+                break;
+            }
+        }
+    };
 
     async function salvarTudo() {
-        if(salvando) return; salvando=true;
-        const statusDiv = document.getElementById('status-msg'); statusDiv.innerHTML = '<span class="material-symbols-outlined text-[#b80049] animate-spin">refresh</span> Salvando...';
+        if(salvando) return;
+        salvando = true;
+        const statusDiv = document.getElementById('status-msg');
+        statusDiv.innerHTML = '<span class="material-symbols-outlined text-[#b80049] animate-spin">refresh</span> Salvando...';
+        
         try {
-            const updates = {}; const idsConfig = ['nome_profissional','sub_nome','bio_curta','email_contato','telefone_contato','foto_perfil_url','youtube_url','instagram_url','tiktok_url','youtube_video_id','tag1','tag2','tiktok_views','tiktok_desc','tiktok_percent','reels_reach','reels_desc','reels_percent','comunidade_num','comunidade_desc','live_views','live_desc','live_texto_destaque','genero_porcentagem','genero_texto','idade_range','idade_texto','citacao','texto_proposta','subtitulo_proposta'];
-            for(let id of idsConfig){ const el = document.getElementById(id); if(el) updates[id]=el.value; }
-            for(let [chave, valor] of Object.entries(updates)){
-                await fetch(`${SUPABASE_URL}/rest/v1/site_config?config_key=eq.${chave}`, { method:'PATCH', headers:{ 'apikey':SUPABASE_ANON_KEY, 'Authorization':`Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type':'application/json' }, body: JSON.stringify({ config_value: valor }) });
+            // 1. SALVAR CONFIGURAÇÕES (inalterado)
+            const updates = {};
+            const idsConfig = ['nome_profissional','sub_nome','bio_curta','email_contato','telefone_contato','foto_perfil_url','youtube_url','instagram_url','tiktok_url','youtube_video_id','tag1','tag2','tiktok_views','tiktok_desc','tiktok_percent','reels_reach','reels_desc','reels_percent','comunidade_num','comunidade_desc','live_views','live_desc','live_texto_destaque','genero_porcentagem','genero_texto','idade_range','idade_texto','citacao','texto_proposta','subtitulo_proposta'];
+            for(let id of idsConfig) {
+                const el = document.getElementById(id);
+                if(el) updates[id] = el.value;
             }
-            const portfolioItens = []; let ordem=0;
-            for(let card of document.querySelectorAll('#portfolio-editor .border')){
-                const img = card.querySelector('input[data-campo="imagem_url"]'); const leg = card.querySelector('input[data-campo="legenda"]');
-                if(img && leg && img.value.trim() !== '') portfolioItens.push({ imagem_url: img.value, legenda: leg.value, ordem: ordem++ });
+            for(let [chave, valor] of Object.entries(updates)) {
+                await fetch(`${SUPABASE_URL}/rest/v1/site_config?config_key=eq.${chave}`, { 
+                    method:'PATCH', 
+                    headers:{ 'apikey':SUPABASE_ANON_KEY, 'Authorization':`Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type':'application/json' }, 
+                    body: JSON.stringify({ config_value: valor }) 
+                });
             }
-            await fetch(`${SUPABASE_URL}/rest/v1/portfolio?order=ordem`, { method:'DELETE', headers:{ 'apikey':SUPABASE_ANON_KEY, 'Authorization':`Bearer ${SUPABASE_ANON_KEY}` } });
-            for(let item of portfolioItens){
-                await fetch(`${SUPABASE_URL}/rest/v1/portfolio`, { method:'POST', headers:{ 'apikey':SUPABASE_ANON_KEY, 'Authorization':`Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type':'application/json' }, body: JSON.stringify({ imagem_url: item.imagem_url, legenda: item.legenda, ordem: item.ordem }) });
+            
+            // 2. 🔧 SALVAR PORTFOLIO SEM APAGAR TUDO (CORREÇÃO DO BUG)
+            const cards = document.querySelectorAll('#portfolio-editor .border');
+            const itemsToKeep = [];
+            const itemsToDelete = [];
+            const itemsToAdd = [];
+            
+            for(let card of cards) {
+                const imgInput = card.querySelector('input[data-campo="imagem_url"]');
+                const legInput = card.querySelector('input[data-campo="legenda"]');
+                const idAttr = imgInput ? imgInput.getAttribute('data-id') : null;
+                
+                if(!imgInput || !legInput) continue;
+                
+                const imagem_url = imgInput.value.trim();
+                if(!imagem_url) continue;
+                
+                const portfolioItem = {
+                    imagem_url: imagem_url,
+                    legenda: legInput.value,
+                    ordem: itemsToKeep.length
+                };
+                
+                // Verificar se é um ID existente (número) ou novo (timestamp)
+                if(idAttr && !isNaN(parseInt(idAttr)) && portfolioOriginalIds.has(parseInt(idAttr))) {
+                    portfolioItem.id = parseInt(idAttr);
+                    itemsToKeep.push(portfolioItem);
+                } else {
+                    itemsToAdd.push(portfolioItem);
+                }
             }
-            statusDiv.innerHTML = '<span class="material-symbols-outlined text-green-600">check_circle</span> Salvo!'; setTimeout(()=>{ statusDiv.innerHTML='<span class="material-symbols-outlined text-[#b80049]">info</span> Pronto para salvar'; },3000);
+            
+            // Coletar IDs para deletar (IDs que estavam no original mas não estão mais nos cards)
+            const currentIds = new Set();
+            for(let card of cards) {
+                const imgInput = card.querySelector('input[data-campo="imagem_url"]');
+                const idAttr = imgInput ? imgInput.getAttribute('data-id') : null;
+                if(idAttr && !isNaN(parseInt(idAttr))) {
+                    currentIds.add(parseInt(idAttr));
+                }
+            }
+            
+            for(let originalId of portfolioOriginalIds) {
+                if(!currentIds.has(originalId)) {
+                    itemsToDelete.push(originalId);
+                }
+            }
+            
+            // Executar DELETE apenas dos itens removidos
+            for(let id of itemsToDelete) {
+                await fetch(`${SUPABASE_URL}/rest/v1/portfolio?id=eq.${id}`, { 
+                    method:'DELETE', 
+                    headers:{ 'apikey':SUPABASE_ANON_KEY, 'Authorization':`Bearer ${SUPABASE_ANON_KEY}` } 
+                });
+            }
+            
+            // Atualizar itens existentes (UPDATE)
+            for(let item of itemsToKeep) {
+                await fetch(`${SUPABASE_URL}/rest/v1/portfolio?id=eq.${item.id}`, { 
+                    method:'PATCH', 
+                    headers:{ 'apikey':SUPABASE_ANON_KEY, 'Authorization':`Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type':'application/json' }, 
+                    body: JSON.stringify({ imagem_url: item.imagem_url, legenda: item.legenda, ordem: item.ordem }) 
+                });
+            }
+            
+            // Inserir novos itens (INSERT)
+            for(let item of itemsToAdd) {
+                await fetch(`${SUPABASE_URL}/rest/v1/portfolio`, { 
+                    method:'POST', 
+                    headers:{ 'apikey':SUPABASE_ANON_KEY, 'Authorization':`Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type':'application/json' }, 
+                    body: JSON.stringify({ imagem_url: item.imagem_url, legenda: item.legenda, ordem: item.ordem }) 
+                });
+            }
+            
+            statusDiv.innerHTML = '<span class="material-symbols-outlined text-green-600">check_circle</span> Salvo!';
+            setTimeout(()=>{ statusDiv.innerHTML='<span class="material-symbols-outlined text-[#b80049]">info</span> Pronto para salvar'; },3000);
+            
+            // Recarregar dados para atualizar IDs
             await carregarDados();
-        } catch(e){ console.error(e); statusDiv.innerHTML = '<span class="material-symbols-outlined text-red-500">error</span> Erro'; setTimeout(()=>{ statusDiv.innerHTML='<span class="material-symbols-outlined text-[#b80049]">info</span> Pronto'; },4000); } finally { salvando=false; }
+            
+        } catch(e) {
+            console.error(e);
+            statusDiv.innerHTML = '<span class="material-symbols-outlined text-red-500">error</span> Erro: ' + (e.message || 'desconhecido');
+            setTimeout(()=>{ statusDiv.innerHTML='<span class="material-symbols-outlined text-[#b80049]">info</span> Pronto'; },4000);
+        } finally {
+            salvando = false;
+        }
     }
+    
     window.descartarAlteracoes = function(){ if(confirm('Descartar alterações não salvas?')) carregarDados(); };
     function escapeHtml(str){ if(!str) return ''; return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
 </script>
