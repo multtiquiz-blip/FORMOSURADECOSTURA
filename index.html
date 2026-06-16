@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Media Kit | Rose Gerçóssimo</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
     <style>
@@ -30,7 +29,6 @@
         @media (max-width: 768px) { .youtube-lite .play-button { width: 50px; height: 50px; } .youtube-lite .play-button span { font-size: 28px; } }
         @media print { .no-print { display: none !important; } body { background: white; } }
         
-        /* 🔧 RESPONSIVIDADE ADICIONAL PARA IFRAME (Fallback) */
         .video-container {
             position: relative;
             width: 100%;
@@ -44,18 +42,82 @@
             height: 100%;
             border-radius: 1rem;
         }
+        
+        /* 🎯 ANIMAÇÕES DAS MÉTRICAS */
+        @keyframes shine {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+        .metric-card {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -200%;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(184, 0, 73, 0.05), transparent);
+            animation: shine 4s infinite;
+            pointer-events: none;
+        }
+        .metric-number {
+            display: inline-block;
+            transition: all 0.3s ease;
+            font-variant-numeric: tabular-nums;
+        }
+        .metric-card:hover .metric-number {
+            transform: scale(1.05);
+            color: #b80049;
+        }
+        .metric-bar {
+            transition: width 0.8s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+        .metric-icon {
+            width: 56px;
+            height: 56px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+        .metric-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .metric-header span:last-child {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #5d5f5f;
+        }
+        
+        /* 🔥 NOVA ANIMAÇÃO COM CSS + JS (MAIS CONFIÁVEL) */
+        .counter-value {
+            transition: all 0.3s ease;
+        }
+        .counter-value.animated {
+            animation: pulse 0.5s ease-out;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
     </style>
 </head>
 <body>
 
 <nav class="sticky top-0 z-50 glass border-b border-white/30 backdrop-blur-md no-print">
     <div class="max-w-[1280px] mx-auto px-4 md:px-6 py-4 flex justify-between items-center">
-        <span class="text-2xl md:text-3xl font-bold text-[#b80049] tracking-tight font-serif">Tailored Influence</span>
+        <span class="text-2xl md:text-3xl font-bold text-[#b80049] tracking-tight font-serif">Formosura de Costura</span>
         <div class="hidden md:flex gap-8 items-center">
             <a href="#portfolio" class="text-[#1b1c1c] hover:text-[#b80049] font-medium transition">Portfólio</a>
             <a href="#metricas" class="text-[#1b1c1c] hover:text-[#b80049] font-medium transition">Métricas</a>
             <a href="#contato" class="text-[#1b1c1c] hover:text-[#b80049] font-medium transition">Contato</a>
-            <button onclick="baixarPDF()" class="bg-[#b80049] text-white px-6 py-2 rounded-full font-bold hover:bg-[#9c003e] transition shadow-md">Baixar Kit (PDF)</button>
         </div>
     </div>
 </nav>
@@ -80,7 +142,7 @@
                 </ul>
             </div>
         </div>
-        <div class="mt-12 pt-8 border-t border-[#efeded] text-center text-sm text-[#5d5f5f]">© 2025 Tailored Influence · Todos os direitos reservados</div>
+        <div class="mt-12 pt-8 border-t border-[#efeded] text-center text-sm text-[#5d5f5f]">© 2025 Formosura de Costura · by Rubemar Moraes · Todos os direitos reservados</div>
     </div>
 </footer>
 
@@ -88,44 +150,44 @@
     const SUPABASE_URL = 'https://nhnhqjyrawaftlomlilg.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5obmhxanlyYXdhZnRsb21saWxnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyMDY3ODgsImV4cCI6MjA5Njc4Mjc4OH0.GtOdh4sLzxrwPxOvnKJO5bf4x4hebpuC9RlR-06V0RE';
     
-    // 🔧 CONTROLE DE CONCORRÊNCIA (Camada 2, 3, 4, 8)
+    // 📱 ÍCONES DAS REDES SOCIAIS
+    const ICONE_YOUTUBE = 'https://nhnhqjyrawaftlomlilg.supabase.co/storage/v1/object/public/iconesredessociais/youtube_10124072.png';
+    const ICONE_INSTAGRAM = 'https://nhnhqjyrawaftlomlilg.supabase.co/storage/v1/object/public/iconesredessociais/instagram_4401407.png';
+    const ICONE_TIKTOK = 'https://nhnhqjyrawaftlomlilg.supabase.co/storage/v1/object/public/iconesredessociais/tiktokoficial_5969008.png';
+    const ICONE_FACEBOOK = 'https://nhnhqjyrawaftlomlilg.supabase.co/storage/v1/object/public/iconesredessociais/facebookl_10096274.png';
+    const LINK_FACEBOOK = 'https://www.facebook.com/formosuradecostura';
+    
+    // 📊 ÍCONES DAS MÉTRICAS
+    const ICONE_TIKTOK_IMPACTO = 'https://nhnhqjyrawaftlomlilg.supabase.co/storage/v1/object/public/iconesredessociais/tiktok%20impacto.png';
+    const ICONE_REELS_INSTA = 'https://nhnhqjyrawaftlomlilg.supabase.co/storage/v1/object/public/iconesredessociais/rees%20insta.png';
+    const ICONE_COMUNIDADE = 'https://nhnhqjyrawaftlomlilg.supabase.co/storage/v1/object/public/iconesredessociais/comunidade.png';
+    
+    // 🔧 CONTROLE DE CONCORRÊNCIA
     let isLoading = false;
     let currentAbortController = null;
-    let cache = {
-        data: null,
-        timestamp: 0
-    };
-    const CACHE_TTL = 30000; // 30 segundos para evitar refetch desnecessário (Camada 16)
+    let cache = { data: null, timestamp: 0 };
+    const CACHE_TTL = 30000;
 
     async function carregarDados() {
-        // 🔒 PREVENIR MÚLTIPLAS CHAMADAS CONCORRENTES (Camada 2)
         if (isLoading) {
             console.warn('[DEBUG] carregarDados já em execução, ignorando nova chamada');
             return;
         }
-        
-        // 🚫 CANCELAR FETCH ANTERIOR SE EXISTIR (Camada 11)
         if (currentAbortController) {
             currentAbortController.abort();
             console.log('[DEBUG] Fetch anterior cancelado');
         }
-        
-        // ✅ VERIFICAR CACHE VÁLIDO (Camada 8 - Idempotência)
         const now = Date.now();
         if (cache.data && (now - cache.timestamp) < CACHE_TTL) {
             console.log('[DEBUG] Usando dados em cache (TTL válido)');
             renderizarDados(cache.data.config, cache.data.portfolio);
             return;
         }
-        
         isLoading = true;
         currentAbortController = new AbortController();
         const signal = currentAbortController.signal;
-        
         try {
             console.log('[DEBUG] Iniciando fetch fresh (sem cache)');
-            
-            // 🔄 FETCH COM ABORT CONTROLLER (Camada 11)
             const [configResp, portResp] = await Promise.all([
                 fetch(`${SUPABASE_URL}/rest/v1/site_config?select=config_key,config_value`, { 
                     headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` },
@@ -136,19 +198,14 @@
                     signal
                 })
             ]);
-            
-            // 🛑 VERIFICAR SE FOI CANCELADO (Camada 2)
             if (signal.aborted) {
                 console.log('[DEBUG] Fetch cancelado, ignorando resposta');
                 return;
             }
-            
             const configArray = await configResp.json();
             const config = {};
             configArray.forEach(item => { config[item.config_key] = item.config_value; });
             let portfolio = await portResp.json();
-            
-            // ✅ IDEMPOTÊNCIA: Remover duplicatas do portfolio por ID (Camada 8)
             const uniquePortfolio = [];
             const seenIds = new Set();
             for (const item of portfolio) {
@@ -159,21 +216,12 @@
                     console.warn(`[DEBUG] Duplicata removida: ID ${item.id}`);
                 }
             }
-            
             if (uniquePortfolio.length !== portfolio.length) {
                 console.warn(`[DEBUG] Removidas ${portfolio.length - uniquePortfolio.length} duplicatas do portfolio`);
                 portfolio = uniquePortfolio;
             }
-            
-            // 💾 ARMAZENAR EM CACHE (Camada 16)
-            cache = {
-                data: { config, portfolio },
-                timestamp: now
-            };
-            
-            // 🎨 RENDERIZAR (Camada 12, 13)
+            cache = { data: { config, portfolio }, timestamp: now };
             renderizarDados(config, portfolio);
-            
         } catch (err) {
             if (err.name === 'AbortError') {
                 console.log('[DEBUG] Fetch abortado pelo usuário');
@@ -185,7 +233,6 @@
                 }
             }
         } finally {
-            // 🔓 LIBERAR LOCK APÓS 100ms (evitar chamadas fantasmas) (Camada 2)
             setTimeout(() => {
                 isLoading = false;
                 currentAbortController = null;
@@ -194,7 +241,91 @@
         }
     }
     
-    // 🧩 FUNÇÃO DE RENDERIZAÇÃO SEPARADA (Camada 7 - evitar stale closure)
+    // 🎯 NOVA FUNÇÃO DE ANIMAÇÃO - MAIS SIMPLES E CONFIÁVEL
+    // Baseada em soluções de fóruns [citation:1][citation:3][citation:4]
+    function animarContador(elemento, valorFinal, duracao = 2500) {
+        if (!elemento) return;
+        
+        // Remove animações anteriores
+        if (elemento._animacaoIntervalo) {
+            clearInterval(elemento._animacaoIntervalo);
+            delete elemento._animacaoIntervalo;
+        }
+        
+        // Converte o valor final
+        let numeroFinal = 0;
+        let sufixo = '';
+        const textoOriginal = String(valorFinal).trim();
+        
+        // Extrai número e sufixo (M, K, %)
+        const match = textoOriginal.match(/^([\d.,]+)\s*([MK%]?)$/i);
+        if (match) {
+            const numeroStr = match[1].replace(/\./g, '').replace(',', '.');
+            numeroFinal = parseFloat(numeroStr) || 0;
+            sufixo = match[2] ? match[2].toUpperCase() : '';
+        } else {
+            numeroFinal = parseFloat(textoOriginal.replace(/[^\d.,]/g, '').replace(',', '.')) || 0;
+        }
+        
+        // Se não for um número válido, exibe o texto original
+        if (isNaN(numeroFinal) || numeroFinal <= 0) {
+            elemento.innerText = textoOriginal;
+            return;
+        }
+        
+        console.log('[DEBUG] Animando:', elemento.id, 'de 0 até', numeroFinal, sufixo);
+        
+        // Se for muito pequeno, exibe direto
+        if (numeroFinal < 10) {
+            elemento.innerText = textoOriginal;
+            return;
+        }
+        
+        // Define o valor inicial como 0
+        elemento.innerText = '0';
+        
+        // Calcula o passo
+        const passos = Math.max(60, Math.floor(duracao / 16));
+        const incremento = numeroFinal / passos;
+        let valorAtual = 0;
+        let passoAtual = 0;
+        
+        // Função para formatar o número
+        function formatarNumero(valor) {
+            if (valor >= 1000000) {
+                return (valor / 1000000).toFixed(1).replace('.', ',') + 'M';
+            } else if (valor >= 1000) {
+                return (valor / 1000).toFixed(1).replace('.', ',') + 'K';
+            } else {
+                let resultado = valor.toLocaleString('pt-BR');
+                if (sufixo && valor < 1000) {
+                    resultado += sufixo;
+                }
+                return resultado;
+            }
+        }
+        
+        // Inicia o intervalo
+        elemento._animacaoIntervalo = setInterval(() => {
+            passoAtual++;
+            valorAtual += incremento;
+            
+            if (passoAtual >= passos || valorAtual >= numeroFinal) {
+                // Valor final
+                elemento.innerText = formatarNumero(numeroFinal);
+                clearInterval(elemento._animacaoIntervalo);
+                delete elemento._animacaoIntervalo;
+                console.log('[DEBUG] Animação concluída:', elemento.id);
+                return;
+            }
+            
+            // Valor intermediário
+            const valorDisplay = Math.floor(valorAtual);
+            elemento.innerText = formatarNumero(valorDisplay);
+        }, 16);
+    }
+    
+    // 🧩 FUNÇÃO DE RENDERIZAÇÃO
     function renderizarDados(config, portfolio) {
         const main = document.getElementById('conteudo-principal');
         if (!main) return;
@@ -205,11 +336,24 @@
                 <div class="lg:col-span-7 space-y-6">
                     <div><h1 class="text-5xl md:text-7xl font-extrabold text-[#b80049] leading-tight">${escapeHtml(config.nome_profissional)}</h1><h2 class="text-2xl md:text-3xl text-[#5d5f5f] italic mt-2">${escapeHtml(config.sub_nome)}</h2><div class="w-24 h-1 bg-gradient-to-r from-[#b80049] to-[#e4bdc2] my-5 rounded-full"></div><p class="text-xl md:text-2xl text-[#5b3f43] font-medium">${escapeHtml(config.bio_curta)}</p></div>
                     <div class="flex flex-wrap gap-3"><div class="px-5 py-2.5 bg-[#b80049]/10 rounded-full text-[#b80049] font-bold flex items-center gap-2"><span class="material-symbols-outlined">stars</span> ${escapeHtml(config.tag1)}</div><div class="px-5 py-2.5 bg-[#b80049]/10 rounded-full text-[#b80049] font-bold flex items-center gap-2"><span class="material-symbols-outlined">auto_graph</span> ${escapeHtml(config.tag2)}</div></div>
-                    <div class="flex gap-4 mt-4"><a href="${escapeHtml(config.youtube_url)}" target="_blank" class="w-12 h-12 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition"><span class="material-symbols-outlined text-2xl">smart_display</span></a><a href="${escapeHtml(config.instagram_url)}" target="_blank" class="w-12 h-12 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition"><span class="material-symbols-outlined text-2xl">photo_camera</span></a><a href="${escapeHtml(config.tiktok_url)}" target="_blank" class="w-12 h-12 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition"><span class="material-symbols-outlined text-2xl">music_note</span></a></div>
+                    <div class="flex gap-4 mt-4">
+                        <a href="${escapeHtml(config.youtube_url)}" target="_blank" class="w-12 h-12 rounded-full bg-[#b80049]/10 flex items-center justify-center hover:bg-[#b80049] transition group">
+                            <img src="${ICONE_YOUTUBE}" alt="YouTube" class="w-6 h-6 group-hover:brightness-0 group-hover:invert">
+                        </a>
+                        <a href="${escapeHtml(config.instagram_url)}" target="_blank" class="w-12 h-12 rounded-full bg-[#b80049]/10 flex items-center justify-center hover:bg-[#b80049] transition group">
+                            <img src="${ICONE_INSTAGRAM}" alt="Instagram" class="w-6 h-6 group-hover:brightness-0 group-hover:invert">
+                        </a>
+                        <a href="${escapeHtml(config.tiktok_url)}" target="_blank" class="w-12 h-12 rounded-full bg-[#b80049]/10 flex items-center justify-center hover:bg-[#b80049] transition group">
+                            <img src="${ICONE_TIKTOK}" alt="TikTok" class="w-6 h-6 group-hover:brightness-0 group-hover:invert">
+                        </a>
+                        <a href="${LINK_FACEBOOK}" target="_blank" class="w-12 h-12 rounded-full bg-[#b80049]/10 flex items-center justify-center hover:bg-[#b80049] transition group">
+                            <img src="${ICONE_FACEBOOK}" alt="Facebook" class="w-6 h-6 group-hover:brightness-0 group-hover:invert">
+                        </a>
+                    </div>
                 </div>
             </div>
             
-            <!-- 🎬 YOUTUBE PLAYER RESPONSIVO - INTEGRAÇÃO DIRETA -->
+            <!-- 🎬 YOUTUBE PLAYER RESPONSIVO -->
             <div class="mb-16 animate-fade-up" style="animation-delay:0.1s">
                 <h3 class="text-2xl md:text-3xl text-[#b80049] mb-5 font-serif flex items-center gap-2">
                     <span class="material-symbols-outlined">smart_display</span> 
@@ -229,51 +373,91 @@
             </div>
             
             <div id="metricas" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-                <div class="bg-white/80 p-6 rounded-2xl soft-shadow border border-white/50 hover-lift"><div class="flex justify-between"><span class="material-symbols-outlined text-[#b80049] text-4xl">brand_family</span><span class="text-xs font-bold uppercase">TikTok Impacto</span></div><div class="mt-8"><div class="text-4xl font-black text-[#b80049]">${escapeHtml(config.tiktok_views)}</div><div class="text-[#5d5f5f] text-sm mt-1">${escapeHtml(config.tiktok_desc)}</div></div><div class="w-full h-1.5 bg-[#efeded] mt-5 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-[#b80049] to-[#e4bdc2] rounded-full" style="--final-width: ${config.tiktok_percent || 0}%; width:0%" data-width="${config.tiktok_percent || 0}"></div></div></div>
-                <div class="bg-white/80 p-6 rounded-2xl soft-shadow border border-white/50 hover-lift"><div class="flex justify-between"><span class="material-symbols-outlined text-[#b80049] text-4xl">movie_edit</span><span class="text-xs font-bold uppercase">Alcance Reels</span></div><div class="mt-8"><div class="text-4xl font-black text-[#b80049]">${escapeHtml(config.reels_reach)}</div><div class="text-[#5d5f5f] text-sm mt-1">${escapeHtml(config.reels_desc)}</div></div><div class="w-full h-1.5 bg-[#efeded] mt-5 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-[#b80049] to-[#e4bdc2] rounded-full" style="--final-width: ${config.reels_percent || 0}%; width:0%" data-width="${config.reels_percent || 0}"></div></div></div>
-                <div class="bg-white/80 p-6 rounded-2xl soft-shadow border border-white/50 hover-lift"><div class="flex justify-between"><span class="material-symbols-outlined text-[#b80049] text-4xl">groups</span><span class="text-xs font-bold uppercase">Comunidade</span></div><div class="mt-8"><div class="text-4xl font-black text-[#b80049]">${escapeHtml(config.comunidade_num)}</div><div class="text-[#5d5f5f] text-sm mt-1">${escapeHtml(config.comunidade_desc)}</div></div><div class="flex mt-5 -space-x-2"><div class="w-8 h-8 rounded-full bg-gray-300 border-2 border-white"></div><div class="w-8 h-8 rounded-full bg-[#e4bdc2] border-2 border-white"></div><div class="w-8 h-8 rounded-full bg-[#b80049]/50 border-2 border-white"></div><div class="w-8 h-8 rounded-full bg-[#b80049] text-white flex items-center justify-center text-xs border-2 border-white">+</div></div></div>
-                <div class="bg-gradient-to-br from-[#b80049] to-[#9c003e] text-white p-6 rounded-2xl shadow-2xl hover-lift"><div class="flex justify-between mb-4"><span class="material-symbols-outlined text-3xl">podcasts</span><span class="px-2 py-1 bg-white/20 rounded-full text-[10px] font-bold uppercase">Destaque</span></div><div class="text-4xl font-black">${escapeHtml(config.live_views)}</div><div class="text-white/80 text-sm mt-1">${escapeHtml(config.live_desc)}</div><p class="mt-4 text-sm">${escapeHtml(config.live_texto_destaque)}</p></div>
+                <div class="metric-card bg-white/80 p-6 rounded-2xl soft-shadow border border-white/50 hover-lift">
+                    <div class="metric-header">
+                        <img src="${ICONE_TIKTOK_IMPACTO}" alt="TikTok Impacto" class="metric-icon">
+                        <span>TikTok Impacto</span>
+                    </div>
+                    <div class="mt-8">
+                        <div class="text-4xl font-black text-[#b80049] metric-number" id="tiktok-counter">0</div>
+                        <div class="text-[#5d5f5f] text-sm mt-1">${escapeHtml(config.tiktok_desc)}</div>
+                    </div>
+                    <div class="w-full h-1.5 bg-[#efeded] mt-5 rounded-full overflow-hidden">
+                        <div class="h-full bg-gradient-to-r from-[#b80049] to-[#e4bdc2] rounded-full metric-bar" style="--final-width: ${config.tiktok_percent || 0}%; width:0%" data-width="${config.tiktok_percent || 0}"></div>
+                    </div>
+                </div>
+                <div class="metric-card bg-white/80 p-6 rounded-2xl soft-shadow border border-white/50 hover-lift">
+                    <div class="metric-header">
+                        <img src="${ICONE_REELS_INSTA}" alt="Alcance Reels" class="metric-icon">
+                        <span>Alcance Reels</span>
+                    </div>
+                    <div class="mt-8">
+                        <div class="text-4xl font-black text-[#b80049] metric-number" id="reels-counter">0</div>
+                        <div class="text-[#5d5f5f] text-sm mt-1">${escapeHtml(config.reels_desc)}</div>
+                    </div>
+                    <div class="w-full h-1.5 bg-[#efeded] mt-5 rounded-full overflow-hidden">
+                        <div class="h-full bg-gradient-to-r from-[#b80049] to-[#e4bdc2] rounded-full metric-bar" style="--final-width: ${config.reels_percent || 0}%; width:0%" data-width="${config.reels_percent || 0}"></div>
+                    </div>
+                </div>
+                <div class="metric-card bg-white/80 p-6 rounded-2xl soft-shadow border border-white/50 hover-lift">
+                    <div class="metric-header">
+                        <img src="${ICONE_COMUNIDADE}" alt="Comunidade" class="metric-icon">
+                        <span>Comunidade</span>
+                    </div>
+                    <div class="mt-8">
+                        <div class="text-4xl font-black text-[#b80049] metric-number" id="comunidade-counter">0</div>
+                        <div class="text-[#5d5f5f] text-sm mt-1">${escapeHtml(config.comunidade_desc)}</div>
+                    </div>
+                    <div class="flex mt-5 -space-x-2">
+                        <div class="w-8 h-8 rounded-full bg-gray-300 border-2 border-white"></div>
+                        <div class="w-8 h-8 rounded-full bg-[#e4bdc2] border-2 border-white"></div>
+                        <div class="w-8 h-8 rounded-full bg-[#b80049]/50 border-2 border-white"></div>
+                        <div class="w-8 h-8 rounded-full bg-[#b80049] text-white flex items-center justify-center text-xs border-2 border-white">+</div>
+                    </div>
+                </div>
+                <div class="bg-gradient-to-br from-[#b80049] to-[#9c003e] text-white p-6 rounded-2xl shadow-2xl hover-lift metric-card">
+                    <div class="flex justify-between mb-4">
+                        <span class="material-symbols-outlined text-3xl">podcasts</span>
+                        <span class="px-2 py-1 bg-white/20 rounded-full text-[10px] font-bold uppercase">Destaque</span>
+                    </div>
+                    <div class="text-4xl font-black metric-number" id="live-counter">0</div>
+                    <div class="text-white/80 text-sm mt-1">${escapeHtml(config.live_desc)}</div>
+                    <p class="mt-4 text-sm">${escapeHtml(config.live_texto_destaque)}</p>
+                </div>
             </div>
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16 animate-fade-up" style="animation-delay:0.2s">
                 <div class="bg-white/80 p-8 rounded-2xl soft-shadow border border-white/50"><h3 class="text-2xl md:text-3xl text-[#b80049] mb-6 flex items-center gap-3"><span class="material-symbols-outlined">pie_chart</span> Perfil da Audiência</h3><div class="grid grid-cols-2 gap-6"><div><div class="text-xs font-bold uppercase text-[#5d5f5f]">Gênero</div><div class="flex items-end gap-2 mt-2"><span class="text-4xl font-black text-[#b80049]">${escapeHtml(config.genero_porcentagem)}</span><span class="material-symbols-outlined text-[#b80049] text-3xl">female</span></div><div class="text-sm mt-1">${escapeHtml(config.genero_texto)}</div></div><div><div class="text-xs font-bold uppercase text-[#5d5f5f]">Idade</div><div class="flex items-end gap-2 mt-2"><span class="text-4xl font-black text-[#b80049]">${escapeHtml(config.idade_range)}</span></div><div class="text-sm mt-1">${escapeHtml(config.idade_texto)}</div></div></div><div class="mt-10 p-6 bg-[#fef5f2] rounded-xl border-l-4 border-[#b80049] italic"><p class="text-lg">“${escapeHtml(config.citacao)}”</p></div></div>
-                <div class="stitching-border bg-white/80 p-8 rounded-2xl flex flex-col justify-center items-center text-center space-y-6 hover-lift"><div class="w-20 h-20 rounded-full bg-[#b80049]/10 flex items-center justify-center"><span class="material-symbols-outlined text-[#b80049] text-4xl">shopping_cart_checkout</span></div><h3 class="text-3xl md:text-4xl font-bold leading-tight">${escapeHtml(config.texto_proposta)}</h3><p class="text-[#5d5f5f] max-w-md">${escapeHtml(config.subtitulo_proposta)}</p><button class="stitching-border border-[#b80049] text-[#b80049] px-8 py-3 rounded-full font-bold hover:bg-[#b80049] hover:text-white transition">Solicitar proposta</button></div>
+                <div class="stitching-border bg-white/80 p-8 rounded-2xl flex flex-col justify-center items-center text-center space-y-6 hover-lift"><div class="w-20 h-20 rounded-full bg-[#b80049]/10 flex items-center justify-center"><span class="material-symbols-outlined text-[#b80049] text-4xl">shopping_cart_checkout</span></div><h3 class="text-3xl md:text-4xl font-bold leading-tight">${escapeHtml(config.texto_proposta)}</h3><p class="text-[#5d5f5f] max-w-md">${escapeHtml(config.subtitulo_proposta)}</p><a href="https://wa.me/5531998705172?text=Ol%C3%A1%21%20Gostaria%20de%20receber%20o%20M%C3%ADdia%20Kit%20atualizado%20para%20conhecer%20os%20formatos%20de%20parceria" target="_blank" rel="noopener noreferrer" class="stitching-border border-[#b80049] text-[#b80049] px-8 py-3 rounded-full font-bold hover:bg-[#b80049] hover:text-white transition">Solicitar proposta</a></div>
             </div>
             <div id="portfolio" class="mb-12 animate-fade-up" style="animation-delay:0.3s"><h3 class="text-2xl md:text-3xl text-[#b80049] mb-6 font-serif">Portfólio Criativo</h3><div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4" id="portfolio-grid"></div></div>
         `;
         
-        // 🖼️ RENDERIZAR PORTFOLIO SEM DUPLICAÇÃO (Camada 6, 12, 13)
+        // 🖼️ RENDERIZAR PORTFOLIO
         const grid = document.getElementById('portfolio-grid');
         if (grid && portfolio && portfolio.length) {
-            // 🧹 LIMPEZA EXPLÍCITA (Camada 6 corrigida)
             grid.innerHTML = '';
-            
-            // ✅ USAR MAP PARA GARANTIR UNICIDADE (Camada 8)
             const uniqueItems = new Map();
             portfolio.forEach(item => {
                 if (!uniqueItems.has(item.id)) {
                     uniqueItems.set(item.id, item);
-                } else {
-                    console.warn(`[DEBUG] Duplicata ignorada no render: ID ${item.id}`);
                 }
             });
-            
-            // 🎨 RENDERIZAR ITENS ÚNICOS
             uniqueItems.forEach((item) => {
                 const card = document.createElement('div');
                 card.className = 'group relative aspect-square bg-[#efeded] rounded-xl overflow-hidden shadow-md hover:shadow-xl transition';
                 card.innerHTML = `<img class="w-full h-full object-cover group-hover:scale-110 transition duration-500" src="${escapeHtml(item.imagem_url)}" alt="${escapeHtml(item.legenda)}" loading="lazy"><div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition flex items-end justify-center p-3"><span class="text-white text-xs font-bold uppercase tracking-wider">${escapeHtml(item.legenda)}</span></div>`;
                 grid.appendChild(card);
             });
-            
-            console.log(`[DEBUG] Renderizados ${uniqueItems.size} itens únicos no portfolio`);
         } else if (grid) {
             grid.innerHTML = '<div class="col-span-full text-center text-gray-500 py-8">Nenhum item no portfólio ainda.</div>';
         }
         
-        // 📊 ANIMAÇÃO DAS BARRAS (Camada 1 - sem mutação direta)
+        // 📊 ANIMAÇÃO DAS BARRAS
         document.querySelectorAll('[data-width]').forEach(bar => { 
-            bar.style.setProperty('--final-width', bar.getAttribute('data-width') + '%'); 
-            bar.classList.add('animate-grow'); 
+            const width = bar.getAttribute('data-width') || 0;
+            setTimeout(() => {
+                bar.style.width = width + '%';
+            }, 300);
         });
         
         // 📞 FOOTER
@@ -281,15 +465,97 @@
         document.getElementById('footer-bio').innerText = config.sub_nome || '';
         document.getElementById('footer-email').innerText = config.email_contato || '';
         document.getElementById('footer-phone').innerText = config.telefone_contato || '';
-        document.getElementById('social-icons-footer').innerHTML = `<a href="${escapeHtml(config.youtube_url)}" target="_blank" class="w-10 h-10 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition"><span class="material-symbols-outlined">smart_display</span></a><a href="${escapeHtml(config.instagram_url)}" target="_blank" class="w-10 h-10 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition"><span class="material-symbols-outlined">photo_camera</span></a><a href="${escapeHtml(config.tiktok_url)}" target="_blank" class="w-10 h-10 rounded-full bg-[#b80049]/10 flex items-center justify-center text-[#b80049] hover:bg-[#b80049] hover:text-white transition"><span class="material-symbols-outlined">music_note</span></a>`;
-
-        // 🎬 YOUTUBE LITE INIT (Camada 11 - sem memory leak) - REMOVIDO PORQUE AGORA É IFRAME DIRETO
-        // O código original do youtube-lite foi mantido no CSS para compatibilidade, mas não é mais usado
-    }
-    
-    function baixarPDF() { 
-        const el = document.getElementById('conteudo-principal'); 
-        if(el) html2pdf().set({ margin: 0.5, filename: 'media-kit-rose.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } }).from(el).save(); 
+        
+        // 📱 ÍCONES NO FOOTER
+        document.getElementById('social-icons-footer').innerHTML = `
+            <a href="${escapeHtml(config.youtube_url)}" target="_blank" class="w-10 h-10 rounded-full bg-[#b80049]/10 flex items-center justify-center hover:bg-[#b80049] transition group">
+                <img src="${ICONE_YOUTUBE}" alt="YouTube" class="w-5 h-5 group-hover:brightness-0 group-hover:invert">
+            </a>
+            <a href="${escapeHtml(config.instagram_url)}" target="_blank" class="w-10 h-10 rounded-full bg-[#b80049]/10 flex items-center justify-center hover:bg-[#b80049] transition group">
+                <img src="${ICONE_INSTAGRAM}" alt="Instagram" class="w-5 h-5 group-hover:brightness-0 group-hover:invert">
+            </a>
+            <a href="${escapeHtml(config.tiktok_url)}" target="_blank" class="w-10 h-10 rounded-full bg-[#b80049]/10 flex items-center justify-center hover:bg-[#b80049] transition group">
+                <img src="${ICONE_TIKTOK}" alt="TikTok" class="w-5 h-5 group-hover:brightness-0 group-hover:invert">
+            </a>
+            <a href="${LINK_FACEBOOK}" target="_blank" class="w-10 h-10 rounded-full bg-[#b80049]/10 flex items-center justify-center hover:bg-[#b80049] transition group">
+                <img src="${ICONE_FACEBOOK}" alt="Facebook" class="w-5 h-5 group-hover:brightness-0 group-hover:invert">
+            </a>
+        `;
+        
+        // 🔥 INICIAR ANIMAÇÕES USANDO INTERSECTION OBSERVER (NOVA ABORDAGEM)
+        // Baseado em soluções de fóruns [citation:1][citation:5]
+        console.log('[DEBUG] Configurando Intersection Observer para animações...');
+        
+        // Função que inicia as animações
+        function iniciarAnimacoes() {
+            console.log('[DEBUG] Iniciando animações dos números...');
+            
+            const elementos = {
+                tiktok: document.getElementById('tiktok-counter'),
+                reels: document.getElementById('reels-counter'),
+                comunidade: document.getElementById('comunidade-counter'),
+                live: document.getElementById('live-counter')
+            };
+            
+            console.log('[DEBUG] Elementos encontrados:', {
+                tiktok: !!elementos.tiktok,
+                reels: !!elementos.reels,
+                comunidade: !!elementos.comunidade,
+                live: !!elementos.live
+            });
+            
+            // Valores corrigidos: 3.3M e 3.6M
+            if (elementos.tiktok) {
+                console.log('[DEBUG] Animando TikTok para 3.3M');
+                animarContador(elementos.tiktok, '3.3M', 2500);
+            }
+            if (elementos.reels) {
+                console.log('[DEBUG] Animando Reels para 3.6M');
+                animarContador(elementos.reels, '3.6M', 2500);
+            }
+            if (elementos.comunidade) {
+                const valorComunidade = config.comunidade_num || '0';
+                console.log('[DEBUG] Animando Comunidade para', valorComunidade);
+                animarContador(elementos.comunidade, valorComunidade, 2500);
+            }
+            if (elementos.live) {
+                const valorLive = config.live_views || '0';
+                console.log('[DEBUG] Animando Live para', valorLive);
+                animarContador(elementos.live, valorLive, 2500);
+            }
+        }
+        
+        // Usa Intersection Observer para iniciar a animação quando a seção ficar visível
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    console.log('[DEBUG] Seção de métricas visível, iniciando animações...');
+                    iniciarAnimacoes();
+                    observer.disconnect(); // Para de observar depois de iniciar
+                }
+            });
+        }, { threshold: 0.3 }); // Inicia quando 30% da seção estiver visível
+        
+        // Observa a seção de métricas
+        const metricasSection = document.getElementById('metricas');
+        if (metricasSection) {
+            observer.observe(metricasSection);
+            console.log('[DEBUG] Observando seção de métricas...');
+        } else {
+            // Fallback: se não encontrar a seção, inicia após 1 segundo
+            console.warn('[DEBUG] Seção de métricas não encontrada, iniciando com delay...');
+            setTimeout(iniciarAnimacoes, 1000);
+        }
+        
+        // Fallback: Se a animação não iniciar em 3 segundos, força início
+        setTimeout(() => {
+            // Verifica se os números ainda estão em 0
+            const tiktokEl = document.getElementById('tiktok-counter');
+            if (tiktokEl && tiktokEl.innerText === '0') {
+                console.warn('[DEBUG] Fallback: forçando início das animações...');
+                iniciarAnimacoes();
+            }
+        }, 3000);
     }
     
     function escapeHtml(str) { 
@@ -297,7 +563,7 @@
         return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); 
     }
     
-    // 🚀 INICIAR COM DEBOUNCE (Camada 15 - proteção contra múltiplos carregamentos)
+    // 🚀 INICIAR
     let debounceTimer;
     function iniciarComDebounce() {
         clearTimeout(debounceTimer);
@@ -305,23 +571,7 @@
             carregarDados();
         }, 300);
     }
-    
-    // ✅ EXECUÇÃO INICIAL SEGURA
     iniciarComDebounce();
-    
-    // 🔄 SE HOUVER SUPABASE REALTIME NO PAINEL, OUVIR MUDANÇAS (Camada 14)
-    // Isso evita polling desnecessário - descomente se quiser realtime
-    /*
-    const supabaseRealtimeChannel = supabase
-        .channel('portfolio-changes')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'portfolio' }, () => {
-            console.log('[REALTIME] Mudança detectada, recarregando com debounce');
-            iniciarComDebounce();
-        })
-        .subscribe();
-    
-    // Cleanup se fosse React (aqui não precisa pois é HTML puro)
-    */
 </script>
 </body>
 </html>
