@@ -29,7 +29,6 @@
         @media (max-width: 768px) { .youtube-lite .play-button { width: 50px; height: 50px; } .youtube-lite .play-button span { font-size: 28px; } }
         @media print { .no-print { display: none !important; } body { background: white; } }
         
-        /* 🔧 RESPONSIVIDADE ADICIONAL PARA IFRAME (Fallback) */
         .video-container {
             position: relative;
             width: 100%;
@@ -68,6 +67,7 @@
         .metric-number {
             display: inline-block;
             transition: all 0.3s ease;
+            font-variant-numeric: tabular-nums;
         }
         .metric-card:hover .metric-number {
             transform: scale(1.05);
@@ -77,9 +77,35 @@
             transition: width 0.8s cubic-bezier(0.2, 0.9, 0.4, 1.1);
         }
         .metric-icon {
-            width: 40px;
-            height: 40px;
+            width: 56px;
+            height: 56px;
             object-fit: contain;
+            flex-shrink: 0;
+        }
+        .metric-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .metric-header span:last-child {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #5d5f5f;
+        }
+        
+        /* 🔥 NOVA ANIMAÇÃO COM CSS + JS (MAIS CONFIÁVEL) */
+        .counter-value {
+            transition: all 0.3s ease;
+        }
+        .counter-value.animated {
+            animation: pulse 0.5s ease-out;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
     </style>
 </head>
@@ -124,13 +150,14 @@
     const SUPABASE_URL = 'https://nhnhqjyrawaftlomlilg.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5obmhxanlyYXdhZnRsb21saWxnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyMDY3ODgsImV4cCI6MjA5Njc4Mjc4OH0.GtOdh4sLzxrwPxOvnKJO5bf4x4hebpuC9RlR-06V0RE';
     
-    // 📱 ÍCONES DAS REDES SOCIAIS (SUPABASE STORAGE)
+    // 📱 ÍCONES DAS REDES SOCIAIS
     const ICONE_YOUTUBE = 'https://nhnhqjyrawaftlomlilg.supabase.co/storage/v1/object/public/iconesredessociais/youtube_10124072.png';
     const ICONE_INSTAGRAM = 'https://nhnhqjyrawaftlomlilg.supabase.co/storage/v1/object/public/iconesredessociais/instagram_4401407.png';
     const ICONE_TIKTOK = 'https://nhnhqjyrawaftlomlilg.supabase.co/storage/v1/object/public/iconesredessociais/tiktokoficial_5969008.png';
     const ICONE_FACEBOOK = 'https://nhnhqjyrawaftlomlilg.supabase.co/storage/v1/object/public/iconesredessociais/facebookl_10096274.png';
+    const LINK_FACEBOOK = 'https://www.facebook.com/formosuradecostura';
     
-    // 📊 ÍCONES DAS MÉTRICAS (NOVOS)
+    // 📊 ÍCONES DAS MÉTRICAS
     const ICONE_TIKTOK_IMPACTO = 'https://nhnhqjyrawaftlomlilg.supabase.co/storage/v1/object/public/iconesredessociais/tiktok%20impacto.png';
     const ICONE_REELS_INSTA = 'https://nhnhqjyrawaftlomlilg.supabase.co/storage/v1/object/public/iconesredessociais/rees%20insta.png';
     const ICONE_COMUNIDADE = 'https://nhnhqjyrawaftlomlilg.supabase.co/storage/v1/object/public/iconesredessociais/comunidade.png';
@@ -138,10 +165,7 @@
     // 🔧 CONTROLE DE CONCORRÊNCIA
     let isLoading = false;
     let currentAbortController = null;
-    let cache = {
-        data: null,
-        timestamp: 0
-    };
+    let cache = { data: null, timestamp: 0 };
     const CACHE_TTL = 30000;
 
     async function carregarDados() {
@@ -149,26 +173,21 @@
             console.warn('[DEBUG] carregarDados já em execução, ignorando nova chamada');
             return;
         }
-        
         if (currentAbortController) {
             currentAbortController.abort();
             console.log('[DEBUG] Fetch anterior cancelado');
         }
-        
         const now = Date.now();
         if (cache.data && (now - cache.timestamp) < CACHE_TTL) {
             console.log('[DEBUG] Usando dados em cache (TTL válido)');
             renderizarDados(cache.data.config, cache.data.portfolio);
             return;
         }
-        
         isLoading = true;
         currentAbortController = new AbortController();
         const signal = currentAbortController.signal;
-        
         try {
             console.log('[DEBUG] Iniciando fetch fresh (sem cache)');
-            
             const [configResp, portResp] = await Promise.all([
                 fetch(`${SUPABASE_URL}/rest/v1/site_config?select=config_key,config_value`, { 
                     headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` },
@@ -179,17 +198,14 @@
                     signal
                 })
             ]);
-            
             if (signal.aborted) {
                 console.log('[DEBUG] Fetch cancelado, ignorando resposta');
                 return;
             }
-            
             const configArray = await configResp.json();
             const config = {};
             configArray.forEach(item => { config[item.config_key] = item.config_value; });
             let portfolio = await portResp.json();
-            
             const uniquePortfolio = [];
             const seenIds = new Set();
             for (const item of portfolio) {
@@ -200,19 +216,12 @@
                     console.warn(`[DEBUG] Duplicata removida: ID ${item.id}`);
                 }
             }
-            
             if (uniquePortfolio.length !== portfolio.length) {
                 console.warn(`[DEBUG] Removidas ${portfolio.length - uniquePortfolio.length} duplicatas do portfolio`);
                 portfolio = uniquePortfolio;
             }
-            
-            cache = {
-                data: { config, portfolio },
-                timestamp: now
-            };
-            
+            cache = { data: { config, portfolio }, timestamp: now };
             renderizarDados(config, portfolio);
-            
         } catch (err) {
             if (err.name === 'AbortError') {
                 console.log('[DEBUG] Fetch abortado pelo usuário');
@@ -232,74 +241,87 @@
         }
     }
     
-    // 🎯 FUNÇÃO DE ANIMAÇÃO DOS NÚMEROS (CORRIGIDA)
-    function animarContador(elemento, valorFinal, duracao = 2000) {
+    // 🎯 NOVA FUNÇÃO DE ANIMAÇÃO - MAIS SIMPLES E CONFIÁVEL
+    // Baseada em soluções de fóruns [citation:1][citation:3][citation:4]
+    function animarContador(elemento, valorFinal, duracao = 2500) {
         if (!elemento) return;
         
-        // Extrai apenas o número (remove "M", "K", etc)
+        // Remove animações anteriores
+        if (elemento._animacaoIntervalo) {
+            clearInterval(elemento._animacaoIntervalo);
+            delete elemento._animacaoIntervalo;
+        }
+        
+        // Converte o valor final
         let numeroFinal = 0;
         let sufixo = '';
         const textoOriginal = String(valorFinal).trim();
         
-        // Verifica se tem sufixo (M, K, etc)
-        const match = textoOriginal.match(/^([\d.,]+)\s*([MK]?)$/i);
+        // Extrai número e sufixo (M, K, %)
+        const match = textoOriginal.match(/^([\d.,]+)\s*([MK%]?)$/i);
         if (match) {
             const numeroStr = match[1].replace(/\./g, '').replace(',', '.');
             numeroFinal = parseFloat(numeroStr) || 0;
             sufixo = match[2] ? match[2].toUpperCase() : '';
         } else {
-            numeroFinal = parseInt(textoOriginal.replace(/\D/g, '')) || 0;
+            numeroFinal = parseFloat(textoOriginal.replace(/[^\d.,]/g, '').replace(',', '.')) || 0;
         }
         
-        if (numeroFinal === 0) {
-            elemento.innerText = '0';
+        // Se não for um número válido, exibe o texto original
+        if (isNaN(numeroFinal) || numeroFinal <= 0) {
+            elemento.innerText = textoOriginal;
             return;
         }
         
-        let valorInicial = 0;
-        const incremento = numeroFinal / (duracao / 16);
+        console.log('[DEBUG] Animando:', elemento.id, 'de 0 até', numeroFinal, sufixo);
         
-        const temporizador = setInterval(() => {
-            valorInicial += incremento;
-            if (valorInicial >= numeroFinal) {
-                // Formata o número final
-                let numeroFormatado = numeroFinal.toLocaleString('pt-BR');
-                if (sufixo) {
-                    numeroFormatado = numeroFormatado.replace(/\./g, '.');
-                    // Se for número grande, mostra com uma casa decimal
-                    if (numeroFinal >= 1000000) {
-                        numeroFormatado = (numeroFinal / 1000000).toFixed(1).replace('.', ',') + 'M';
-                    } else if (numeroFinal >= 1000) {
-                        numeroFormatado = (numeroFinal / 1000).toFixed(1).replace('.', ',') + 'K';
-                    } else {
-                        numeroFormatado = numeroFormatado + sufixo;
-                    }
-                } else {
-                    // Formata com pontos para milhares
-                    if (numeroFinal >= 1000000) {
-                        numeroFormatado = (numeroFinal / 1000000).toFixed(1).replace('.', ',') + 'M';
-                    } else if (numeroFinal >= 1000) {
-                        numeroFormatado = (numeroFinal / 1000).toFixed(1).replace('.', ',') + 'K';
-                    } else {
-                        numeroFormatado = numeroFinal.toLocaleString('pt-BR');
-                    }
-                }
-                elemento.innerText = numeroFormatado;
-                clearInterval(temporizador);
+        // Se for muito pequeno, exibe direto
+        if (numeroFinal < 10) {
+            elemento.innerText = textoOriginal;
+            return;
+        }
+        
+        // Define o valor inicial como 0
+        elemento.innerText = '0';
+        
+        // Calcula o passo
+        const passos = Math.max(60, Math.floor(duracao / 16));
+        const incremento = numeroFinal / passos;
+        let valorAtual = 0;
+        let passoAtual = 0;
+        
+        // Função para formatar o número
+        function formatarNumero(valor) {
+            if (valor >= 1000000) {
+                return (valor / 1000000).toFixed(1).replace('.', ',') + 'M';
+            } else if (valor >= 1000) {
+                return (valor / 1000).toFixed(1).replace('.', ',') + 'K';
             } else {
-                let valorAtual = Math.floor(valorInicial);
-                let numeroFormatado = valorAtual.toLocaleString('pt-BR');
-                if (sufixo && valorAtual >= 1000) {
-                    if (valorAtual >= 1000000) {
-                        numeroFormatado = (valorAtual / 1000000).toFixed(1).replace('.', ',') + 'M';
-                    } else {
-                        numeroFormatado = (valorAtual / 1000).toFixed(1).replace('.', ',') + 'K';
-                    }
-                } else if (sufixo) {
-                    numeroFormatado = numeroFormatado + sufixo;
+                let resultado = valor.toLocaleString('pt-BR');
+                if (sufixo && valor < 1000) {
+                    resultado += sufixo;
                 }
-                elemento.innerText = numeroFormatado;
+                return resultado;
             }
+        }
+        
+        // Inicia o intervalo
+        elemento._animacaoIntervalo = setInterval(() => {
+            passoAtual++;
+            valorAtual += incremento;
+            
+            if (passoAtual >= passos || valorAtual >= numeroFinal) {
+                // Valor final
+                elemento.innerText = formatarNumero(numeroFinal);
+                clearInterval(elemento._animacaoIntervalo);
+                delete elemento._animacaoIntervalo;
+                console.log('[DEBUG] Animação concluída:', elemento.id);
+                return;
+            }
+            
+            // Valor intermediário
+            const valorDisplay = Math.floor(valorAtual);
+            elemento.innerText = formatarNumero(valorDisplay);
         }, 16);
     }
     
@@ -324,7 +346,7 @@
                         <a href="${escapeHtml(config.tiktok_url)}" target="_blank" class="w-12 h-12 rounded-full bg-[#b80049]/10 flex items-center justify-center hover:bg-[#b80049] transition group">
                             <img src="${ICONE_TIKTOK}" alt="TikTok" class="w-6 h-6 group-hover:brightness-0 group-hover:invert">
                         </a>
-                        <a href="${escapeHtml(config.facebook_url)}" target="_blank" class="w-12 h-12 rounded-full bg-[#b80049]/10 flex items-center justify-center hover:bg-[#b80049] transition group">
+                        <a href="${LINK_FACEBOOK}" target="_blank" class="w-12 h-12 rounded-full bg-[#b80049]/10 flex items-center justify-center hover:bg-[#b80049] transition group">
                             <img src="${ICONE_FACEBOOK}" alt="Facebook" class="w-6 h-6 group-hover:brightness-0 group-hover:invert">
                         </a>
                     </div>
@@ -352,12 +374,12 @@
             
             <div id="metricas" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
                 <div class="metric-card bg-white/80 p-6 rounded-2xl soft-shadow border border-white/50 hover-lift">
-                    <div class="flex justify-between items-start">
+                    <div class="metric-header">
                         <img src="${ICONE_TIKTOK_IMPACTO}" alt="TikTok Impacto" class="metric-icon">
-                        <span class="text-xs font-bold uppercase">TikTok Impacto</span>
+                        <span>TikTok Impacto</span>
                     </div>
                     <div class="mt-8">
-                        <div class="text-4xl font-black text-[#b80049] metric-number" id="tiktok-counter">${escapeHtml(config.tiktok_views)}</div>
+                        <div class="text-4xl font-black text-[#b80049] metric-number" id="tiktok-counter">0</div>
                         <div class="text-[#5d5f5f] text-sm mt-1">${escapeHtml(config.tiktok_desc)}</div>
                     </div>
                     <div class="w-full h-1.5 bg-[#efeded] mt-5 rounded-full overflow-hidden">
@@ -365,12 +387,12 @@
                     </div>
                 </div>
                 <div class="metric-card bg-white/80 p-6 rounded-2xl soft-shadow border border-white/50 hover-lift">
-                    <div class="flex justify-between items-start">
+                    <div class="metric-header">
                         <img src="${ICONE_REELS_INSTA}" alt="Alcance Reels" class="metric-icon">
-                        <span class="text-xs font-bold uppercase">Alcance Reels</span>
+                        <span>Alcance Reels</span>
                     </div>
                     <div class="mt-8">
-                        <div class="text-4xl font-black text-[#b80049] metric-number" id="reels-counter">${escapeHtml(config.reels_reach)}</div>
+                        <div class="text-4xl font-black text-[#b80049] metric-number" id="reels-counter">0</div>
                         <div class="text-[#5d5f5f] text-sm mt-1">${escapeHtml(config.reels_desc)}</div>
                     </div>
                     <div class="w-full h-1.5 bg-[#efeded] mt-5 rounded-full overflow-hidden">
@@ -378,12 +400,12 @@
                     </div>
                 </div>
                 <div class="metric-card bg-white/80 p-6 rounded-2xl soft-shadow border border-white/50 hover-lift">
-                    <div class="flex justify-between items-start">
+                    <div class="metric-header">
                         <img src="${ICONE_COMUNIDADE}" alt="Comunidade" class="metric-icon">
-                        <span class="text-xs font-bold uppercase">Comunidade</span>
+                        <span>Comunidade</span>
                     </div>
                     <div class="mt-8">
-                        <div class="text-4xl font-black text-[#b80049] metric-number" id="comunidade-counter">${escapeHtml(config.comunidade_num)}</div>
+                        <div class="text-4xl font-black text-[#b80049] metric-number" id="comunidade-counter">0</div>
                         <div class="text-[#5d5f5f] text-sm mt-1">${escapeHtml(config.comunidade_desc)}</div>
                     </div>
                     <div class="flex mt-5 -space-x-2">
@@ -398,7 +420,7 @@
                         <span class="material-symbols-outlined text-3xl">podcasts</span>
                         <span class="px-2 py-1 bg-white/20 rounded-full text-[10px] font-bold uppercase">Destaque</span>
                     </div>
-                    <div class="text-4xl font-black metric-number" id="live-counter">${escapeHtml(config.live_views)}</div>
+                    <div class="text-4xl font-black metric-number" id="live-counter">0</div>
                     <div class="text-white/80 text-sm mt-1">${escapeHtml(config.live_desc)}</div>
                     <p class="mt-4 text-sm">${escapeHtml(config.live_texto_destaque)}</p>
                 </div>
@@ -455,24 +477,85 @@
             <a href="${escapeHtml(config.tiktok_url)}" target="_blank" class="w-10 h-10 rounded-full bg-[#b80049]/10 flex items-center justify-center hover:bg-[#b80049] transition group">
                 <img src="${ICONE_TIKTOK}" alt="TikTok" class="w-5 h-5 group-hover:brightness-0 group-hover:invert">
             </a>
-            <a href="${escapeHtml(config.facebook_url)}" target="_blank" class="w-10 h-10 rounded-full bg-[#b80049]/10 flex items-center justify-center hover:bg-[#b80049] transition group">
+            <a href="${LINK_FACEBOOK}" target="_blank" class="w-10 h-10 rounded-full bg-[#b80049]/10 flex items-center justify-center hover:bg-[#b80049] transition group">
                 <img src="${ICONE_FACEBOOK}" alt="Facebook" class="w-5 h-5 group-hover:brightness-0 group-hover:invert">
             </a>
         `;
         
-        // 🎯 INICIAR ANIMAÇÕES DOS NÚMEROS (CORRIGIDO)
-        setTimeout(() => {
-            const tiktokEl = document.getElementById('tiktok-counter');
-            const reelsEl = document.getElementById('reels-counter');
-            const comunidadeEl = document.getElementById('comunidade-counter');
-            const liveEl = document.getElementById('live-counter');
+        // 🔥 INICIAR ANIMAÇÕES USANDO INTERSECTION OBSERVER (NOVA ABORDAGEM)
+        // Baseado em soluções de fóruns [citation:1][citation:5]
+        console.log('[DEBUG] Configurando Intersection Observer para animações...');
+        
+        // Função que inicia as animações
+        function iniciarAnimacoes() {
+            console.log('[DEBUG] Iniciando animações dos números...');
+            
+            const elementos = {
+                tiktok: document.getElementById('tiktok-counter'),
+                reels: document.getElementById('reels-counter'),
+                comunidade: document.getElementById('comunidade-counter'),
+                live: document.getElementById('live-counter')
+            };
+            
+            console.log('[DEBUG] Elementos encontrados:', {
+                tiktok: !!elementos.tiktok,
+                reels: !!elementos.reels,
+                comunidade: !!elementos.comunidade,
+                live: !!elementos.live
+            });
             
             // Valores corrigidos: 3.3M e 3.6M
-            if (tiktokEl) animarContador(tiktokEl, '3.3M');
-            if (reelsEl) animarContador(reelsEl, '3.6M');
-            if (comunidadeEl) animarContador(comunidadeEl, config.comunidade_num || '0');
-            if (liveEl) animarContador(liveEl, config.live_views || '0');
-        }, 500);
+            if (elementos.tiktok) {
+                console.log('[DEBUG] Animando TikTok para 3.3M');
+                animarContador(elementos.tiktok, '3.3M', 2500);
+            }
+            if (elementos.reels) {
+                console.log('[DEBUG] Animando Reels para 3.6M');
+                animarContador(elementos.reels, '3.6M', 2500);
+            }
+            if (elementos.comunidade) {
+                const valorComunidade = config.comunidade_num || '0';
+                console.log('[DEBUG] Animando Comunidade para', valorComunidade);
+                animarContador(elementos.comunidade, valorComunidade, 2500);
+            }
+            if (elementos.live) {
+                const valorLive = config.live_views || '0';
+                console.log('[DEBUG] Animando Live para', valorLive);
+                animarContador(elementos.live, valorLive, 2500);
+            }
+        }
+        
+        // Usa Intersection Observer para iniciar a animação quando a seção ficar visível
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    console.log('[DEBUG] Seção de métricas visível, iniciando animações...');
+                    iniciarAnimacoes();
+                    observer.disconnect(); // Para de observar depois de iniciar
+                }
+            });
+        }, { threshold: 0.3 }); // Inicia quando 30% da seção estiver visível
+        
+        // Observa a seção de métricas
+        const metricasSection = document.getElementById('metricas');
+        if (metricasSection) {
+            observer.observe(metricasSection);
+            console.log('[DEBUG] Observando seção de métricas...');
+        } else {
+            // Fallback: se não encontrar a seção, inicia após 1 segundo
+            console.warn('[DEBUG] Seção de métricas não encontrada, iniciando com delay...');
+            setTimeout(iniciarAnimacoes, 1000);
+        }
+        
+        // Fallback: Se a animação não iniciar em 3 segundos, força início
+        setTimeout(() => {
+            // Verifica se os números ainda estão em 0
+            const tiktokEl = document.getElementById('tiktok-counter');
+            if (tiktokEl && tiktokEl.innerText === '0') {
+                console.warn('[DEBUG] Fallback: forçando início das animações...');
+                iniciarAnimacoes();
+            }
+        }, 3000);
     }
     
     function escapeHtml(str) { 
