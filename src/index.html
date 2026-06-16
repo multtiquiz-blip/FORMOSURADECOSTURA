@@ -94,19 +94,6 @@
             letter-spacing: 0.05em;
             color: #5d5f5f;
         }
-        
-        /* 🔥 NOVA ANIMAÇÃO COM CSS + JS (MAIS CONFIÁVEL) */
-        .counter-value {
-            transition: all 0.3s ease;
-        }
-        .counter-value.animated {
-            animation: pulse 0.5s ease-out;
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
     </style>
 </head>
 <body>
@@ -147,6 +134,7 @@
 </footer>
 
 <script>
+    // 🔥 CONEXÃO COM SUPABASE
     const SUPABASE_URL = 'https://nhnhqjyrawaftlomlilg.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5obmhxanlyYXdhZnRsb21saWxnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyMDY3ODgsImV4cCI6MjA5Njc4Mjc4OH0.GtOdh4sLzxrwPxOvnKJO5bf4x4hebpuC9RlR-06V0RE';
     
@@ -168,6 +156,7 @@
     let cache = { data: null, timestamp: 0 };
     const CACHE_TTL = 30000;
 
+    // 🚀 FUNÇÃO QUE BUSCA DADOS DO SUPABASE
     async function carregarDados() {
         if (isLoading) {
             console.warn('[DEBUG] carregarDados já em execução, ignorando nova chamada');
@@ -187,7 +176,7 @@
         currentAbortController = new AbortController();
         const signal = currentAbortController.signal;
         try {
-            console.log('[DEBUG] Iniciando fetch fresh (sem cache)');
+            console.log('[DEBUG] Buscando dados do Supabase...');
             const [configResp, portResp] = await Promise.all([
                 fetch(`${SUPABASE_URL}/rest/v1/site_config?select=config_key,config_value`, { 
                     headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` },
@@ -206,20 +195,21 @@
             const config = {};
             configArray.forEach(item => { config[item.config_key] = item.config_value; });
             let portfolio = await portResp.json();
+            
+            // Remove duplicatas
             const uniquePortfolio = [];
             const seenIds = new Set();
             for (const item of portfolio) {
                 if (!seenIds.has(item.id)) {
                     seenIds.add(item.id);
                     uniquePortfolio.push(item);
-                } else {
-                    console.warn(`[DEBUG] Duplicata removida: ID ${item.id}`);
                 }
             }
             if (uniquePortfolio.length !== portfolio.length) {
-                console.warn(`[DEBUG] Removidas ${portfolio.length - uniquePortfolio.length} duplicatas do portfolio`);
+                console.warn(`[DEBUG] Removidas ${portfolio.length - uniquePortfolio.length} duplicatas`);
                 portfolio = uniquePortfolio;
             }
+            
             cache = { data: { config, portfolio }, timestamp: now };
             renderizarDados(config, portfolio);
         } catch (err) {
@@ -241,12 +231,14 @@
         }
     }
     
-    // 🎯 NOVA FUNÇÃO DE ANIMAÇÃO - MAIS SIMPLES E CONFIÁVEL
-    // Baseada em soluções de fóruns [citation:1][citation:3][citation:4]
+    // 🎯 FUNÇÃO DE ANIMAÇÃO DOS NÚMEROS (COM FORMATAÇÃO CORRIGIDA PARA "mil")
     function animarContador(elemento, valorFinal, duracao = 2500) {
-        if (!elemento) return;
+        if (!elemento) {
+            console.warn('[DEBUG] Elemento não encontrado para animação');
+            return;
+        }
         
-        // Remove animações anteriores
+        // Remove animação anterior
         if (elemento._animacaoIntervalo) {
             clearInterval(elemento._animacaoIntervalo);
             delete elemento._animacaoIntervalo;
@@ -254,72 +246,65 @@
         
         // Converte o valor final
         let numeroFinal = 0;
-        let sufixo = '';
         const textoOriginal = String(valorFinal).trim();
         
-        // Extrai número e sufixo (M, K, %)
-        const match = textoOriginal.match(/^([\d.,]+)\s*([MK%]?)$/i);
-        if (match) {
-            const numeroStr = match[1].replace(/\./g, '').replace(',', '.');
-            numeroFinal = parseFloat(numeroStr) || 0;
-            sufixo = match[2] ? match[2].toUpperCase() : '';
-        } else {
-            numeroFinal = parseFloat(textoOriginal.replace(/[^\d.,]/g, '').replace(',', '.')) || 0;
+        // Tenta extrair número do texto (ex: "47", "3.3M", "1.2K")
+        let numeroStr = textoOriginal.replace(/[^\d.,]/g, '').replace(',', '.');
+        numeroFinal = parseFloat(numeroStr) || 0;
+        
+        // Se tiver sufixo M ou K, multiplica
+        if (textoOriginal.includes('M') && !textoOriginal.includes('K')) {
+            numeroFinal = numeroFinal * 1000000;
+        } else if (textoOriginal.includes('K')) {
+            numeroFinal = numeroFinal * 1000;
         }
         
-        // Se não for um número válido, exibe o texto original
         if (isNaN(numeroFinal) || numeroFinal <= 0) {
             elemento.innerText = textoOriginal;
             return;
         }
         
-        console.log('[DEBUG] Animando:', elemento.id, 'de 0 até', numeroFinal, sufixo);
+        console.log('[DEBUG] Animando:', elemento.id, 'de 0 até', numeroFinal);
         
-        // Se for muito pequeno, exibe direto
-        if (numeroFinal < 10) {
-            elemento.innerText = textoOriginal;
-            return;
-        }
-        
-        // Define o valor inicial como 0
         elemento.innerText = '0';
         
-        // Calcula o passo
         const passos = Math.max(60, Math.floor(duracao / 16));
         const incremento = numeroFinal / passos;
         let valorAtual = 0;
         let passoAtual = 0;
         
-        // Função para formatar o número
+        // 🔥 FUNÇÃO DE FORMATAÇÃO CORRIGIDA (ADICIONA "mil" para números menores que 1000)
         function formatarNumero(valor) {
+            // Se for maior que 1 milhão
             if (valor >= 1000000) {
                 return (valor / 1000000).toFixed(1).replace('.', ',') + 'M';
-            } else if (valor >= 1000) {
+            } 
+            // Se for maior que 1 mil
+            else if (valor >= 1000) {
                 return (valor / 1000).toFixed(1).replace('.', ',') + 'K';
-            } else {
-                let resultado = valor.toLocaleString('pt-BR');
-                if (sufixo && valor < 1000) {
-                    resultado += sufixo;
-                }
-                return resultado;
+            } 
+            // Se for menor que 1000 (LIVE e COMUNIDADE)
+            else if (valor >= 1) {
+                return Math.floor(valor).toLocaleString('pt-BR') + ' mil';
+            } 
+            // Se for 0 ou vazio
+            else {
+                return '0';
             }
         }
         
-        // Inicia o intervalo
         elemento._animacaoIntervalo = setInterval(() => {
             passoAtual++;
             valorAtual += incremento;
             
             if (passoAtual >= passos || valorAtual >= numeroFinal) {
-                // Valor final
                 elemento.innerText = formatarNumero(numeroFinal);
                 clearInterval(elemento._animacaoIntervalo);
                 delete elemento._animacaoIntervalo;
-                console.log('[DEBUG] Animação concluída:', elemento.id);
+                console.log('[DEBUG] Animação concluída:', elemento.id, '->', elemento.innerText);
                 return;
             }
             
-            // Valor intermediário
             const valorDisplay = Math.floor(valorAtual);
             elemento.innerText = formatarNumero(valorDisplay);
         }, 16);
@@ -327,6 +312,8 @@
     
     // 🧩 FUNÇÃO DE RENDERIZAÇÃO
     function renderizarDados(config, portfolio) {
+        console.log('[DEBUG] Renderizando com dados do Supabase');
+        
         const main = document.getElementById('conteudo-principal');
         if (!main) return;
         
@@ -373,6 +360,7 @@
             </div>
             
             <div id="metricas" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+                <!-- TikTok Impacto -->
                 <div class="metric-card bg-white/80 p-6 rounded-2xl soft-shadow border border-white/50 hover-lift">
                     <div class="metric-header">
                         <img src="${ICONE_TIKTOK_IMPACTO}" alt="TikTok Impacto" class="metric-icon">
@@ -386,6 +374,8 @@
                         <div class="h-full bg-gradient-to-r from-[#b80049] to-[#e4bdc2] rounded-full metric-bar" style="--final-width: ${config.tiktok_percent || 0}%; width:0%" data-width="${config.tiktok_percent || 0}"></div>
                     </div>
                 </div>
+                
+                <!-- Alcance Reels -->
                 <div class="metric-card bg-white/80 p-6 rounded-2xl soft-shadow border border-white/50 hover-lift">
                     <div class="metric-header">
                         <img src="${ICONE_REELS_INSTA}" alt="Alcance Reels" class="metric-icon">
@@ -399,6 +389,8 @@
                         <div class="h-full bg-gradient-to-r from-[#b80049] to-[#e4bdc2] rounded-full metric-bar" style="--final-width: ${config.reels_percent || 0}%; width:0%" data-width="${config.reels_percent || 0}"></div>
                     </div>
                 </div>
+                
+                <!-- Comunidade -->
                 <div class="metric-card bg-white/80 p-6 rounded-2xl soft-shadow border border-white/50 hover-lift">
                     <div class="metric-header">
                         <img src="${ICONE_COMUNIDADE}" alt="Comunidade" class="metric-icon">
@@ -415,6 +407,8 @@
                         <div class="w-8 h-8 rounded-full bg-[#b80049] text-white flex items-center justify-center text-xs border-2 border-white">+</div>
                     </div>
                 </div>
+                
+                <!-- Live -->
                 <div class="bg-gradient-to-br from-[#b80049] to-[#9c003e] text-white p-6 rounded-2xl shadow-2xl hover-lift metric-card">
                     <div class="flex justify-between mb-4">
                         <span class="material-symbols-outlined text-3xl">podcasts</span>
@@ -425,6 +419,7 @@
                     <p class="mt-4 text-sm">${escapeHtml(config.live_texto_destaque)}</p>
                 </div>
             </div>
+            
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16 animate-fade-up" style="animation-delay:0.2s">
                 <div class="bg-white/80 p-8 rounded-2xl soft-shadow border border-white/50"><h3 class="text-2xl md:text-3xl text-[#b80049] mb-6 flex items-center gap-3"><span class="material-symbols-outlined">pie_chart</span> Perfil da Audiência</h3><div class="grid grid-cols-2 gap-6"><div><div class="text-xs font-bold uppercase text-[#5d5f5f]">Gênero</div><div class="flex items-end gap-2 mt-2"><span class="text-4xl font-black text-[#b80049]">${escapeHtml(config.genero_porcentagem)}</span><span class="material-symbols-outlined text-[#b80049] text-3xl">female</span></div><div class="text-sm mt-1">${escapeHtml(config.genero_texto)}</div></div><div><div class="text-xs font-bold uppercase text-[#5d5f5f]">Idade</div><div class="flex items-end gap-2 mt-2"><span class="text-4xl font-black text-[#b80049]">${escapeHtml(config.idade_range)}</span></div><div class="text-sm mt-1">${escapeHtml(config.idade_texto)}</div></div></div><div class="mt-10 p-6 bg-[#fef5f2] rounded-xl border-l-4 border-[#b80049] italic"><p class="text-lg">“${escapeHtml(config.citacao)}”</p></div></div>
                 <div class="stitching-border bg-white/80 p-8 rounded-2xl flex flex-col justify-center items-center text-center space-y-6 hover-lift"><div class="w-20 h-20 rounded-full bg-[#b80049]/10 flex items-center justify-center"><span class="material-symbols-outlined text-[#b80049] text-4xl">shopping_cart_checkout</span></div><h3 class="text-3xl md:text-4xl font-bold leading-tight">${escapeHtml(config.texto_proposta)}</h3><p class="text-[#5d5f5f] max-w-md">${escapeHtml(config.subtitulo_proposta)}</p><a href="https://wa.me/5531998705172?text=Ol%C3%A1%21%20Gostaria%20de%20receber%20o%20M%C3%ADdia%20Kit%20atualizado%20para%20conhecer%20os%20formatos%20de%20parceria" target="_blank" rel="noopener noreferrer" class="stitching-border border-[#b80049] text-[#b80049] px-8 py-3 rounded-full font-bold hover:bg-[#b80049] hover:text-white transition">Solicitar proposta</a></div>
@@ -466,7 +461,6 @@
         document.getElementById('footer-email').innerText = config.email_contato || '';
         document.getElementById('footer-phone').innerText = config.telefone_contato || '';
         
-        // 📱 ÍCONES NO FOOTER
         document.getElementById('social-icons-footer').innerHTML = `
             <a href="${escapeHtml(config.youtube_url)}" target="_blank" class="w-10 h-10 rounded-full bg-[#b80049]/10 flex items-center justify-center hover:bg-[#b80049] transition group">
                 <img src="${ICONE_YOUTUBE}" alt="YouTube" class="w-5 h-5 group-hover:brightness-0 group-hover:invert">
@@ -482,11 +476,9 @@
             </a>
         `;
         
-        // 🔥 INICIAR ANIMAÇÕES USANDO INTERSECTION OBSERVER (NOVA ABORDAGEM)
-        // Baseado em soluções de fóruns [citation:1][citation:5]
-        console.log('[DEBUG] Configurando Intersection Observer para animações...');
+        // 🔥 INICIAR ANIMAÇÕES
+        console.log('[DEBUG] Configurando animações...');
         
-        // Função que inicia as animações
         function iniciarAnimacoes() {
             console.log('[DEBUG] Iniciando animações dos números...');
             
@@ -497,59 +489,59 @@
                 live: document.getElementById('live-counter')
             };
             
-            console.log('[DEBUG] Elementos encontrados:', {
-                tiktok: !!elementos.tiktok,
-                reels: !!elementos.reels,
-                comunidade: !!elementos.comunidade,
-                live: !!elementos.live
+            // ✅ VALORES DO SUPABASE (COM FALLBACK)
+            const valorTiktok = config.tiktok_views || '3.3M';
+            const valorReels = config.reels_reach || '3.6M';
+            const valorComunidade = config.comunidade_num || '47';
+            const valorLive = config.live_views || '47';
+            
+            console.log('[DEBUG] Valores do Supabase:', {
+                tiktok: valorTiktok,
+                reels: valorReels,
+                comunidade: valorComunidade,
+                live: valorLive
             });
             
-            // Valores corrigidos: 3.3M e 3.6M
             if (elementos.tiktok) {
-                console.log('[DEBUG] Animando TikTok para 3.3M');
-                animarContador(elementos.tiktok, '3.3M', 2500);
+                console.log('[DEBUG] Animando TikTok para', valorTiktok);
+                animarContador(elementos.tiktok, valorTiktok, 2500);
             }
             if (elementos.reels) {
-                console.log('[DEBUG] Animando Reels para 3.6M');
-                animarContador(elementos.reels, '3.6M', 2500);
+                console.log('[DEBUG] Animando Reels para', valorReels);
+                animarContador(elementos.reels, valorReels, 2500);
             }
             if (elementos.comunidade) {
-                const valorComunidade = config.comunidade_num || '0';
                 console.log('[DEBUG] Animando Comunidade para', valorComunidade);
                 animarContador(elementos.comunidade, valorComunidade, 2500);
             }
             if (elementos.live) {
-                const valorLive = config.live_views || '0';
                 console.log('[DEBUG] Animando Live para', valorLive);
                 animarContador(elementos.live, valorLive, 2500);
             }
         }
         
-        // Usa Intersection Observer para iniciar a animação quando a seção ficar visível
+        // Observer para iniciar quando visível
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     console.log('[DEBUG] Seção de métricas visível, iniciando animações...');
                     iniciarAnimacoes();
-                    observer.disconnect(); // Para de observar depois de iniciar
+                    observer.disconnect();
                 }
             });
-        }, { threshold: 0.3 }); // Inicia quando 30% da seção estiver visível
+        }, { threshold: 0.3 });
         
-        // Observa a seção de métricas
         const metricasSection = document.getElementById('metricas');
         if (metricasSection) {
             observer.observe(metricasSection);
             console.log('[DEBUG] Observando seção de métricas...');
         } else {
-            // Fallback: se não encontrar a seção, inicia após 1 segundo
             console.warn('[DEBUG] Seção de métricas não encontrada, iniciando com delay...');
             setTimeout(iniciarAnimacoes, 1000);
         }
         
-        // Fallback: Se a animação não iniciar em 3 segundos, força início
+        // Fallback: força início após 3 segundos
         setTimeout(() => {
-            // Verifica se os números ainda estão em 0
             const tiktokEl = document.getElementById('tiktok-counter');
             if (tiktokEl && tiktokEl.innerText === '0') {
                 console.warn('[DEBUG] Fallback: forçando início das animações...');
@@ -563,7 +555,7 @@
         return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); 
     }
     
-    // 🚀 INICIAR
+    // 🚀 INICIAR COM DEBOUNCE
     let debounceTimer;
     function iniciarComDebounce() {
         clearTimeout(debounceTimer);
